@@ -1,4 +1,23 @@
+mod core;
+mod detected_version;
+mod shared_constants;
+
+use tracing::info;
+
+async fn setup_logging() {
+    let subscriber = tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .finish();
+    tracing::subscriber::set_global_default(subscriber).expect("setting tracing subscriber failed");
+}
+
 #[tokio::main]
 async fn main() {
-    println!("Hello, world!");
+    setup_logging().await;
+    info!("Hello, world!");
+    info!("World version: {:#?}", *shared_constants::WORLD_VERSION);
+
+    // TODO: Crash Reports
+    // TODO: log file
+    // TODO: profiling
 }

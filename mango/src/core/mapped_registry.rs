@@ -31,7 +31,7 @@ impl Lifecycle {
 pub trait Registry: Send + Sync + Debug {}
 
 pub trait WritableRegistry<T> {
-    fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo);
+    fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo) -> usize;
 
     fn key(&self) -> &ResourceKey;
 }
@@ -77,7 +77,7 @@ impl<T: Send + Sync + Debug> Registry for MappedRegistry<T> {}
 
 /// https://www.reddit.com/r/rust/comments/droxdg/why_arent_traits_impld_for_boxdyn_trait/
 impl<T> WritableRegistry<T> for MappedRegistry<T> {
-    fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo) {
+    fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo) -> usize {
         self.validate_write(&key);
         if self.by_location.contains_key(&key.location) {
             panic!("Adding duplicate key '{}' to registry", key);
@@ -93,6 +93,7 @@ impl<T> WritableRegistry<T> for MappedRegistry<T> {
         self.by_key.insert(key, index);
         let mut lifecycle = self.lifecycle.write().unwrap();
         *lifecycle = lifecycle.add(registration_info.lifecycle);
+        index
         // let value_rg = self.values.read().unwrap();
         // value_rg.get(index).unwrap_or_else(|| {
         //     panic!(
@@ -118,12 +119,13 @@ impl<T> WritableRegistry<T> for MappedRegistry<T> {
 /// This allows callers to use trait generics instead of trait objects. For example,
 /// see [crate::core::registry::register_key].
 impl<T: BlockTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dyn BlockTrait>> {
-    fn register(&self, key: ResourceKey, value: Arc<T>, registration_info: RegistrationInfo) {
-        (self as &dyn WritableRegistry<Arc<dyn BlockTrait>>).register(
-            key,
-            value,
-            registration_info,
-        );
+    fn register(
+        &self,
+        key: ResourceKey,
+        value: Arc<T>,
+        registration_info: RegistrationInfo,
+    ) -> usize {
+        (self as &dyn WritableRegistry<Arc<dyn BlockTrait>>).register(key, value, registration_info)
     }
 
     fn key(&self) -> &ResourceKey {

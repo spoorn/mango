@@ -17,6 +17,9 @@ pub struct Properties {
     #[builder(default = true)]
     pub has_collision: bool,
     pub sound_type: SoundType,
+    /// `light_emission` in vanilla
+    #[builder(default = |_| 0)]
+    pub light_level: fn(BlockState) -> u8,
     #[builder(default = true)]
     pub can_occlude: bool,
     pub destroy_time: f32,

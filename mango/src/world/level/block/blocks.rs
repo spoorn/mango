@@ -22,6 +22,7 @@ pub fn bootstrap() {
                 .replaceable(true)
                 .no_collision()
                 .instabreak()
+                .light_level(|_| 15)
                 .sound_type(sound_type::WOOL.clone())
                 .push_reaction(PushReaction::Destroy)
                 .build(),

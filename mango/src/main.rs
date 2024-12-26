@@ -1,6 +1,10 @@
+mod bootstrap;
 mod core;
 mod detected_version;
+mod packs;
+mod resources;
 mod shared_constants;
+mod world;
 
 use tracing::info;
 
@@ -20,4 +24,6 @@ async fn main() {
     // TODO: Crash Reports
     // TODO: log file
     // TODO: profiling
+
+    bootstrap::bootstrap();
 }

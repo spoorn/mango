@@ -4,6 +4,7 @@ use crate::core::registries::registries;
 use crate::core::registries::registries::root_registry_name;
 use crate::resources::resource_key::ResourceKey;
 use crate::resources::resource_location::ResourceLocation;
+use crate::sounds::sound_event::SoundEvent;
 use crate::world::level::block::block::BlockTrait;
 use dashmap::DashMap;
 use std::fmt::Debug;
@@ -11,8 +12,9 @@ use std::sync::{Arc, OnceLock, RwLock};
 
 // TODO: Optimize and remove RwLock?
 pub static REGISTRY: OnceLock<MappedRegistry<Arc<dyn Registry>>> = OnceLock::new();
-
 pub static BLOCK: OnceLock<Arc<MappedRegistry<Arc<dyn BlockTrait>>>> = OnceLock::new();
+// TODO: does SoundEvent need to be wrapped around Arc? They seem to be immutable so maybe we just copy everywhere
+pub static SOUND_EVENT: OnceLock<Arc<MappedRegistry<SoundEvent>>> = OnceLock::new();
 
 pub fn registry() -> &'static MappedRegistry<Arc<dyn Registry>> {
     REGISTRY.get().unwrap()
@@ -20,6 +22,10 @@ pub fn registry() -> &'static MappedRegistry<Arc<dyn Registry>> {
 
 pub fn block_registry() -> Arc<MappedRegistry<Arc<dyn BlockTrait>>> {
     Arc::clone(BLOCK.get().unwrap())
+}
+
+pub fn sound_event_registry() -> Arc<MappedRegistry<SoundEvent>> {
+    Arc::clone(SOUND_EVENT.get().unwrap())
 }
 
 pub fn bootstrap() {
@@ -30,6 +36,7 @@ pub fn bootstrap() {
         )
     });
     BLOCK.get_or_init(|| register_defaulted_with_intrusive_holders(registries::BLOCK.clone()));
+    SOUND_EVENT.get_or_init(|| register_simple(registries::SOUND_EVENT.clone()));
 }
 
 #[derive(Debug)]
@@ -58,6 +65,8 @@ pub trait Registry: Send + Sync + Debug {}
 
 pub trait WritableRegistry<T> {
     fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo);
+
+    fn key(&self) -> &ResourceKey;
 }
 
 #[derive(Debug)]
@@ -119,6 +128,10 @@ impl<T> WritableRegistry<T> for MappedRegistry<T> {
         //     )
         // })
     }
+
+    fn key(&self) -> &ResourceKey {
+        &self.key
+    }
 }
 
 /// This is needed because Arc<dyn Trait> is not implemented for Arc<T: Trait> from above with
@@ -139,9 +152,17 @@ impl<T: BlockTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dy
             registration_info,
         );
     }
+
+    fn key(&self) -> &ResourceKey {
+        (self as &dyn WritableRegistry<Arc<dyn BlockTrait>>).key()
+    }
 }
 
-// TODO: No DefaultedMappedRegistry
+fn register_simple<T: Send + Sync + Debug + 'static>(key: ResourceKey) -> Arc<MappedRegistry<T>> {
+    internal_register(key.clone(), MappedRegistry::new(key, Lifecycle::Stable))
+}
+
+// TODO: No DefaultedMappedRegistry so this is the same as register_simple
 fn register_defaulted_with_intrusive_holders<T: Send + Sync + Debug + 'static>(
     key: ResourceKey,
 ) -> Arc<MappedRegistry<T>> {

@@ -17,8 +17,8 @@ impl ResourceLocation {
         Self { namespace, path }
     }
 
-    pub fn with_default_namespace(path: String) -> Self {
-        Self::new("minecraft".to_string(), path)
+    pub fn with_default_namespace(path: &str) -> Self {
+        Self::new("minecraft".to_string(), path.to_string())
     }
 }
 

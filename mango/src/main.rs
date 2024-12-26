@@ -4,6 +4,7 @@ mod detected_version;
 mod packs;
 mod resources;
 mod shared_constants;
+mod sounds;
 mod world;
 
 use tracing::info;

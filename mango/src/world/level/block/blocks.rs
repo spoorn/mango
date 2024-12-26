@@ -4,6 +4,7 @@ use crate::resources::resource_key::ResourceKey;
 use crate::resources::resource_location::ResourceLocation;
 use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::fire_block::FireBlock;
+use crate::world::level::block::sound_type;
 use crate::world::level::block::state::block_behavior::Properties;
 use std::sync::{Arc, OnceLock};
 
@@ -18,6 +19,7 @@ pub fn bootstrap() {
                 .replaceable(true)
                 .no_collision()
                 .instabreak()
+                .sound_type(sound_type::WOOL.clone())
                 .build(),
         )
     });
@@ -26,7 +28,7 @@ pub fn bootstrap() {
 pub fn vanilla_block_id(path: &str) -> ResourceKey {
     ResourceKey::create(
         &registries::BLOCK,
-        ResourceLocation::with_default_namespace(path.to_string()),
+        ResourceLocation::with_default_namespace(path),
     )
 }
 

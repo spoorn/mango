@@ -1,4 +1,5 @@
 use crate::resources::resource_key::ResourceKey;
+use crate::world::level::block::sound_type::SoundType;
 use crate::world::level::block::state::block_behavior::properties_builder::{
     SetCanOcclude, SetDestroyTime, SetExplosionResistance, SetHasCollision, State,
 };
@@ -12,6 +13,7 @@ pub struct Properties {
     pub replaceable: bool,
     #[builder(default = true)]
     pub has_collision: bool,
+    pub sound_type: SoundType,
     #[builder(default = true)]
     pub can_occlude: bool,
     pub destroy_time: f32,

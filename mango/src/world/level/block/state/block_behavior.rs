@@ -1,16 +1,19 @@
 use crate::resources::resource_key::ResourceKey;
 use crate::world::level::block::sound_type::SoundType;
 use crate::world::level::block::state::block_behavior::properties_builder::{
-    SetCanOcclude, SetDestroyTime, SetExplosionResistance, SetHasCollision, State,
+    IsUnset, SetCanOcclude, SetDestroyTime, SetExplosionResistance, SetHasCollision, State,
 };
+use crate::world::level::material::map_color;
+use crate::world::level::material::map_color::MapColor;
 use crate::world::level::material::push_reaction::PushReaction;
 use bon::Builder;
-use bon::__::IsUnset;
 
 #[derive(Builder)]
 #[builder(state_mod(vis = "pub"))]
 pub struct Properties {
     pub id: Option<ResourceKey>,
+    #[builder(default = |_| map_color::NONE)]
+    pub map_color: fn(BlockState) -> MapColor,
     #[builder(default = true)]
     pub has_collision: bool,
     pub sound_type: SoundType,
@@ -65,3 +68,5 @@ impl<S: State> PropertiesBuilder<S> {
             .explosion_resistance(explosion_resistance)
     }
 }
+
+pub struct BlockState {}

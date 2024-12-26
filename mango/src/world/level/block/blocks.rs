@@ -6,6 +6,7 @@ use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::fire_block::FireBlock;
 use crate::world::level::block::sound_type;
 use crate::world::level::block::state::block_behavior::Properties;
+use crate::world::level::material::map_color;
 use crate::world::level::material::push_reaction::PushReaction;
 use std::sync::{Arc, OnceLock};
 
@@ -17,6 +18,7 @@ pub fn bootstrap() {
             "fire",
             FireBlock::new,
             Properties::builder()
+                .map_color(|_| map_color::FIRE)
                 .replaceable(true)
                 .no_collision()
                 .instabreak()

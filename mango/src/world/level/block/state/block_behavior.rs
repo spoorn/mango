@@ -3,6 +3,7 @@ use crate::world::level::block::sound_type::SoundType;
 use crate::world::level::block::state::block_behavior::properties_builder::{
     SetCanOcclude, SetDestroyTime, SetExplosionResistance, SetHasCollision, State,
 };
+use crate::world::level::material::push_reaction::PushReaction;
 use bon::Builder;
 use bon::__::IsUnset;
 
@@ -10,7 +11,6 @@ use bon::__::IsUnset;
 #[builder(state_mod(vis = "pub"))]
 pub struct Properties {
     pub id: Option<ResourceKey>,
-    pub replaceable: bool,
     #[builder(default = true)]
     pub has_collision: bool,
     pub sound_type: SoundType,
@@ -19,6 +19,9 @@ pub struct Properties {
     pub destroy_time: f32,
     #[builder(with = |r: f32| f32::max(0.0, r))]
     pub explosion_resistance: f32,
+    #[builder(default)]
+    pub push_reaction: PushReaction,
+    pub replaceable: bool,
 }
 
 impl<S: State> PropertiesBuilder<S> {

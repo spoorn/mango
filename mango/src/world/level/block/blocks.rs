@@ -6,6 +6,7 @@ use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::fire_block::FireBlock;
 use crate::world::level::block::sound_type;
 use crate::world::level::block::state::block_behavior::Properties;
+use crate::world::level::material::push_reaction::PushReaction;
 use std::sync::{Arc, OnceLock};
 
 pub static FIRE: OnceLock<Arc<FireBlock>> = OnceLock::new();
@@ -20,6 +21,7 @@ pub fn bootstrap() {
                 .no_collision()
                 .instabreak()
                 .sound_type(sound_type::WOOL.clone())
+                .push_reaction(PushReaction::Destroy)
                 .build(),
         )
     });

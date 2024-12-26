@@ -1,4 +1,4 @@
-use crate::core::registries::built_in_registries::Lifecycle;
+use crate::core::mapped_registry::Lifecycle;
 use crate::packs::repository::known_pack::KnownPack;
 
 pub const BUILT_IN: RegistrationInfo = RegistrationInfo {

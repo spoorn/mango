@@ -40,9 +40,9 @@ pub trait BlockBehaviour {
     // TODO: vanilla has a CollisionContext here but it's only used for LightBlock
     fn get_shape(
         &self,
-        block_state: &BlockState,
-        block_getter: &dyn BlockGetter,
-        block_pos: BlockPos,
+        _block_state: &BlockState,
+        _block_getter: &dyn BlockGetter,
+        _block_pos: BlockPos,
     ) -> Box<dyn VoxelShapeTrait> {
         shapes::block()
     }
@@ -103,7 +103,7 @@ pub struct Properties {
     pub push_reaction: PushReaction,
     #[builder(default = false)]
     pub replaceable: bool,
-    #[builder(default = |block_state, block_getter, block_pos, entity_type| block_state.is_face_sturdy(block_getter, block_pos, Direction::Up) && block_state.light_emission < 14)]
+    #[builder(default = |block_state, block_getter, block_pos, _entity_type| block_state.is_face_sturdy(block_getter, block_pos, Direction::Up) && block_state.light_emission < 14)]
     pub is_valid_spawn: fn(&BlockState, &dyn BlockGetter, BlockPos, usize) -> bool,
     #[builder(default = |block_state, block_getter, block_pos| block_state.is_collision_shape_full_block(block_getter, block_pos))]
     pub is_redstone_conductor: BlockCheckFn,

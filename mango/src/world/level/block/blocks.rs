@@ -3,6 +3,7 @@ use crate::core::registries::{built_in_registries, registries};
 use crate::core::{registry, Indexed};
 use crate::resources::resource_key::ResourceKey;
 use crate::resources::resource_location::ResourceLocation;
+use crate::world::entity::entity_type;
 use crate::world::level::block::bamboo_sapling_block::BambooSaplingBlock;
 use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::fire_block::FireBlock;
@@ -115,13 +116,12 @@ fn never(_block_state: &BlockState, _block_getter: &dyn BlockGetter, _block_pos:
     false
 }
 
-// TODO: implement this
 fn ocelot_or_parrot(
-    block_state: &BlockState,
-    block_getter: &dyn BlockGetter,
-    block_pos: BlockPos,
+    _block_state: &BlockState,
+    _block_getter: &dyn BlockGetter,
+    _block_pos: BlockPos,
     entity_type: usize,
 ) -> bool {
-    false
-    //entity_type == EntityType::OCELOT || entity_type == EntityType::PARROT
+    entity_type == entity_type::OCELOT.get().unwrap().id
+        || entity_type == entity_type::PARROT.get().unwrap().id
 }

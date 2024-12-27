@@ -4,6 +4,8 @@ use std::sync::LazyLock;
 
 pub static BLOCK: LazyLock<ResourceKey> = LazyLock::new(|| create_default_registry_key("block"));
 pub static ITEM: LazyLock<ResourceKey> = LazyLock::new(|| create_default_registry_key("item"));
+pub static ENTITY_TYPE: LazyLock<ResourceKey> =
+    LazyLock::new(|| create_default_registry_key("entity_type"));
 pub static SOUND_EVENT: LazyLock<ResourceKey> =
     LazyLock::new(|| create_default_registry_key("sound_event"));
 

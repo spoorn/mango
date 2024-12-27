@@ -4,10 +4,11 @@ use crate::resources::resource_location::ResourceLocation;
 use crate::world::item::item::ItemTrait;
 use crate::world::level::block::block::BlockTrait;
 use dashmap::DashMap;
+use serde::Serialize;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 pub enum Lifecycle {
     Stable,
     Experimental,
@@ -29,6 +30,7 @@ impl Lifecycle {
     }
 }
 
+#[typetag::serialize(tag = "type")]
 pub trait Registry: Send + Sync + Debug {}
 
 pub trait WritableRegistry<T> {
@@ -45,7 +47,7 @@ pub trait WritableRegistry<T> {
 /// made thread-safe.
 ///
 /// If performance becomes a concern, we can switch to unsafe without significant redesign.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct MappedRegistry<T> {
     pub key: ResourceKey,
     pub lifecycle: RwLock<Lifecycle>,
@@ -78,7 +80,8 @@ impl<T> MappedRegistry<T> {
     }
 }
 
-impl<T: Send + Sync + Debug> Registry for MappedRegistry<T> {}
+#[typetag::serialize]
+impl<T: Send + Sync + Debug + Serialize> Registry for MappedRegistry<T> {}
 
 /// Writable Registry that assumes the value is a cloneable reference pointer (e.g. Arc).
 ///

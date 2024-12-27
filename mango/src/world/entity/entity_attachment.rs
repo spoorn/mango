@@ -1,8 +1,9 @@
 use crate::world::phys::vec3;
 use crate::world::phys::vec3::Vec3;
+use serde::Serialize;
 use strum::EnumIter;
 
-#[derive(Debug, EnumIter, Hash, Eq, PartialEq)]
+#[derive(Debug, EnumIter, Hash, Eq, PartialEq, Serialize)]
 pub enum EntityAttachment {
     Passenger,
     Vehicle,

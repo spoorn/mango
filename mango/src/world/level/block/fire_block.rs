@@ -2,8 +2,9 @@ use crate::world::level::block::block::{Block, BlockTrait};
 use crate::world::level::block::blocks;
 use crate::world::level::block::state::block_behavior::{BlockBehaviour, Properties};
 use dashmap::DashMap;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct FireBlock {
     block: Block,
     pub ignite_odds: DashMap<usize, u32>,
@@ -16,6 +17,7 @@ impl BlockBehaviour for FireBlock {
     }
 }
 
+#[typetag::serialize]
 impl BlockTrait for FireBlock {}
 
 impl FireBlock {

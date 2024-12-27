@@ -1,6 +1,7 @@
 use crate::resources::resource_location::ResourceLocation;
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct SoundEvent {
     pub location: ResourceLocation,
     pub fixed_range: Option<f32>,

@@ -7,6 +7,7 @@ use crate::sounds::sound_event::SoundEvent;
 use crate::world::entity::entity_type::EntityType;
 use crate::world::item::item::ItemTrait;
 use crate::world::level::block::block::BlockTrait;
+use serde::Serialize;
 use std::fmt::Debug;
 use std::sync::{Arc, OnceLock};
 
@@ -57,18 +58,23 @@ pub fn bootstrap() {
     SOUND_EVENT.get_or_init(|| register_simple(registries::SOUND_EVENT.clone()));
 }
 
-fn register_simple<T: Send + Sync + Debug + 'static>(key: ResourceKey) -> Arc<MappedRegistry<T>> {
-    internal_register(key.clone(), MappedRegistry::new(key, Lifecycle::Stable))
-}
-
-// TODO: No DefaultedMappedRegistry so this is the same as register_simple
-fn register_defaulted_with_intrusive_holders<T: Send + Sync + Debug + 'static>(
+fn register_simple<T: Send + Sync + Debug + Serialize + 'static>(
     key: ResourceKey,
 ) -> Arc<MappedRegistry<T>> {
     internal_register(key.clone(), MappedRegistry::new(key, Lifecycle::Stable))
 }
 
-fn internal_register<R: Registry + Send + Sync + 'static>(key: ResourceKey, value: R) -> Arc<R> {
+// TODO: No DefaultedMappedRegistry so this is the same as register_simple
+fn register_defaulted_with_intrusive_holders<T: Send + Sync + Debug + Serialize + 'static>(
+    key: ResourceKey,
+) -> Arc<MappedRegistry<T>> {
+    internal_register(key.clone(), MappedRegistry::new(key, Lifecycle::Stable))
+}
+
+fn internal_register<R: Registry + Send + Sync + Serialize + 'static>(
+    key: ResourceKey,
+    value: R,
+) -> Arc<R> {
     let arc_value = Arc::new(value);
     registry().register(key, arc_value.clone(), registration_info::BUILT_IN);
     arc_value

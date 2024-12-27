@@ -12,6 +12,7 @@ use crate::world::entity::mob_category::MobCategory;
 use crate::world::level::level::Level;
 use crate::world::phys::vec3::Vec3;
 use bon::Builder;
+use serde::Serialize;
 use std::sync::{Arc, OnceLock};
 
 pub static OCELOT: OnceLock<Indexed<EntityType>> = OnceLock::new();
@@ -47,10 +48,11 @@ pub fn bootstrap() {
 
 pub type EntityFactory = fn(EntityType, Level) -> Box<dyn EntityTrait>;
 
-#[derive(Debug, Builder)]
+#[derive(Debug, Builder, Serialize)]
 pub struct EntityType {
     #[builder(field = EntityDimensions::scalable(0.6, 1.8))]
     dimensions: EntityDimensions,
+    #[serde(skip)]
     factory: EntityFactory,
     mob_category: MobCategory,
     client_tracking_range: i32,

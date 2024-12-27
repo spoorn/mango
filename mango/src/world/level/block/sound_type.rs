@@ -2,6 +2,7 @@
 
 use crate::sounds::sound_event::SoundEvent;
 use crate::sounds::sound_events;
+use serde::Serialize;
 use std::clone::Clone;
 use std::sync::LazyLock;
 
@@ -42,7 +43,7 @@ pub static GRASS: LazyLock<SoundType> = LazyLock::new(|| SoundType {
     fall_sound: sound_events::GRASS_FALL.clone(),
 });
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SoundType {
     pub volume: f32,
     pub pitch: f32,

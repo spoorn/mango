@@ -1,6 +1,7 @@
+use serde_with::SerializeDisplay;
 use std::fmt::Display;
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, SerializeDisplay)]
 pub struct ResourceLocation {
     pub namespace: String,
     pub path: String,

@@ -1,8 +1,9 @@
 use crate::world::entity::entity_attachment::EntityAttachment;
 use crate::world::entity::entity_attachments::EntityAttachments;
 use crate::world::phys::vec3::Vec3;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct EntityDimensions {
     pub width: f32,
     pub height: f32,

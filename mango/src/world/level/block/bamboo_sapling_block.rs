@@ -1,8 +1,9 @@
 use crate::world::level::block::block::{Block, BlockTrait};
 use crate::world::level::block::state::block_behavior::{BlockBehaviour, Properties};
+use serde::Serialize;
 use std::ops::Deref;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BambooSaplingBlock {
     block: Block,
 }
@@ -13,6 +14,7 @@ impl BlockBehaviour for BambooSaplingBlock {
     }
 }
 
+#[typetag::serialize]
 impl BlockTrait for BambooSaplingBlock {}
 impl Deref for BambooSaplingBlock {
     type Target = Block;

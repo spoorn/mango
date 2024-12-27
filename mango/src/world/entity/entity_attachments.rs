@@ -1,9 +1,10 @@
 use crate::world::entity::entity_attachment::EntityAttachment;
 use crate::world::phys::vec3::Vec3;
+use serde::Serialize;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct EntityAttachments {
     attachments: HashMap<EntityAttachment, Vec<Vec3>>,
 }

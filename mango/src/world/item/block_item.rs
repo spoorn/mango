@@ -1,11 +1,13 @@
 use crate::core::Indexed;
 use crate::world::item::item::{ItemTrait, Properties};
 use crate::world::level::block::block::BlockTrait;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BlockItem {
     block: usize,
 }
+#[typetag::serialize]
 impl ItemTrait for BlockItem {
     fn is_block_item(&self) -> bool {
         true

@@ -19,6 +19,7 @@ use crate::world::phys::shapes::shapes;
 use crate::world::phys::shapes::voxel_shape::VoxelShapeTrait;
 use crate::world::phys::vec3::Vec3;
 use bon::Builder;
+use serde::Serialize;
 use std::borrow::Borrow;
 
 /// Function that checks a boolean property of a block
@@ -74,16 +75,18 @@ pub trait BlockBehaviour {
     }
 }
 
-#[derive(Builder, Debug)]
+#[derive(Builder, Debug, Serialize)]
 #[builder(state_mod(vis = "pub"))]
 pub struct Properties {
     pub id: Option<ResourceKey>,
+    #[serde(skip)]
     #[builder(default = |_| map_color::NONE)]
     pub map_color: fn(BlockState) -> MapColor,
     #[builder(default = true)]
     pub has_collision: bool,
     pub sound_type: SoundType,
     /// `light_emission` in vanilla
+    #[serde(skip)]
     #[builder(default = |_| 0)]
     pub light_level: fn(&BlockState) -> u8,
     #[builder(default = true)]
@@ -103,14 +106,19 @@ pub struct Properties {
     pub push_reaction: PushReaction,
     #[builder(default = false)]
     pub replaceable: bool,
+    #[serde(skip)]
     #[builder(default = |block_state, block_getter, block_pos, _entity_type| block_state.is_face_sturdy(block_getter, block_pos, Direction::Up) && block_state.light_emission < 14)]
     pub is_valid_spawn: fn(&BlockState, &dyn BlockGetter, BlockPos, usize) -> bool,
+    #[serde(skip)]
     #[builder(default = |block_state, block_getter, block_pos| block_state.is_collision_shape_full_block(block_getter, block_pos))]
     pub is_redstone_conductor: BlockCheckFn,
+    #[serde(skip)]
     #[builder(default = |block_state, block_getter, block_pos| block_state.blocks_motion() && block_state.is_collision_shape_full_block(block_getter, block_pos))]
     pub is_suffocating: BlockCheckFn,
     /// Defaults to same as is_suffocating
+    #[serde(skip)]
     pub is_view_blocking: Option<BlockCheckFn>,
+    #[serde(skip)]
     pub offset_function: Option<fn(BlockState, BlockPos) -> Vec3>,
 }
 

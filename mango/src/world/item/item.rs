@@ -2,6 +2,7 @@ use crate::resources::resource_key::ResourceKey;
 use crate::util;
 use crate::world::item::item::properties_builder::{IsUnset, SetDescriptionId, State};
 use bon::Builder;
+use serde::Serialize;
 use std::fmt::Debug;
 
 const BLOCK_DESCRIPTION_ID: fn(ResourceKey) -> String =
@@ -25,6 +26,7 @@ impl<S: State> PropertiesBuilder<S> {
     }
 }
 
+#[typetag::serialize(tag = "type")]
 pub trait ItemTrait: Send + Sync + Debug {
     // instead of instanceof
     fn is_block_item(&self) -> bool {
@@ -32,8 +34,9 @@ pub trait ItemTrait: Send + Sync + Debug {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Item {}
+#[typetag::serialize]
 impl ItemTrait for Item {}
 impl Item {
     pub fn new(properties: Properties) -> Self {

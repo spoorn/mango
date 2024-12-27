@@ -7,6 +7,7 @@ use crate::world::entity::entity_type;
 use crate::world::level::block::bamboo_sapling_block::BambooSaplingBlock;
 use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::fire_block::FireBlock;
+use crate::world::level::block::leaves_block::LeavesBlock;
 use crate::world::level::block::sound_type;
 use crate::world::level::block::sound_type::SoundType;
 use crate::world::level::block::state::block_behavior::{BlockState, OffsetType, Properties};
@@ -16,9 +17,10 @@ use crate::world::level::material::map_color;
 use crate::world::level::material::push_reaction::PushReaction;
 use std::sync::{Arc, OnceLock};
 
-pub static FIRE: OnceLock<Indexed<Arc<FireBlock>>> = OnceLock::new();
-pub static COBWEB: OnceLock<Indexed<Arc<WebBlock>>> = OnceLock::new();
-pub static BAMBOO_SAPLING: OnceLock<Indexed<Arc<BambooSaplingBlock>>> = OnceLock::new();
+pub static FIRE: OnceLock<Indexed<FireBlock>> = OnceLock::new();
+pub static COBWEB: OnceLock<Indexed<WebBlock>> = OnceLock::new();
+pub static BAMBOO_SAPLING: OnceLock<Indexed<BambooSaplingBlock>> = OnceLock::new();
+pub static JUNGLE_LEAVES: OnceLock<Indexed<LeavesBlock>> = OnceLock::new();
 
 pub fn bootstrap() {
     FIRE.get_or_init(|| {
@@ -69,6 +71,13 @@ pub fn bootstrap() {
                 .build(),
         )
     });
+    JUNGLE_LEAVES.get_or_init(|| {
+        register_block(
+            "jungle_leaves",
+            LeavesBlock::new,
+            leaves_properties(sound_type::GRASS.clone()),
+        )
+    });
 }
 
 pub fn vanilla_block_id(path: &str) -> ResourceKey {
@@ -82,7 +91,7 @@ fn register_block<T: BlockTrait + 'static>(
     path: &str,
     block_fn: fn(Properties) -> T,
     properties: Properties,
-) -> Indexed<Arc<T>> {
+) -> Indexed<T> {
     register(vanilla_block_id(path), block_fn, properties)
 }
 
@@ -90,7 +99,7 @@ fn register<T: BlockTrait + 'static>(
     key: ResourceKey,
     block_fn: fn(Properties) -> T,
     mut properties: Properties,
-) -> Indexed<Arc<T>> {
+) -> Indexed<T> {
     properties.id = Some(key.clone());
     let block = Arc::new(block_fn(properties));
     registry::register_key(built_in_registries::block_registry(), key, block)

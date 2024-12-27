@@ -1,7 +1,6 @@
 use crate::core::Indexed;
 use crate::world::item::item::{ItemTrait, Properties};
 use crate::world::level::block::block::BlockTrait;
-use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct BlockItem {
@@ -13,7 +12,7 @@ impl ItemTrait for BlockItem {
     }
 }
 impl BlockItem {
-    pub fn new<T: BlockTrait>(block: Indexed<Arc<T>>, properties: Properties) -> Self {
+    pub fn new<T: BlockTrait>(block: Indexed<T>, properties: Properties) -> Self {
         Self { block: block.id }
     }
     pub fn register_blocks() {

@@ -8,7 +8,7 @@ pub fn register_key<T, R: WritableRegistry<Arc<T>>>(
     registry: Arc<R>,
     key: ResourceKey,
     value: Arc<T>,
-) -> Indexed<Arc<T>> {
+) -> Indexed<T> {
     Indexed {
         id: registry.register(key, Arc::clone(&value), registration_info::BUILT_IN),
         value,
@@ -19,7 +19,7 @@ pub fn register_location<T, R: WritableRegistry<Arc<T>>>(
     registry: Arc<R>,
     location: ResourceLocation,
     value: Arc<T>,
-) -> Indexed<Arc<T>> {
+) -> Indexed<T> {
     let key = ResourceKey::create(registry.key(), location);
     register_key(registry, key, value)
 }

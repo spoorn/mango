@@ -23,8 +23,14 @@ pub static BAMBOO_SAPLING_BREAK: LazyLock<SoundEvent> =
 pub static BAMBOO_STEP: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo.step"));
 pub static BAMBOO_SAPLING_PLACE: LazyLock<SoundEvent> =
     LazyLock::new(|| register_path("block.bamboo_sapling.place"));
-pub static BAMBOO_SAPLING_HIT: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo_sapling.hit"));
+pub static BAMBOO_SAPLING_HIT: LazyLock<SoundEvent> =
+    LazyLock::new(|| register_path("block.bamboo_sapling.hit"));
 pub static BAMBOO_FALL: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo.fall"));
+pub static GRASS_BREAK: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.grass.break"));
+pub static GRASS_STEP: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.grass.step"));
+pub static GRASS_PLACE: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.grass.place"));
+pub static GRASS_HIT: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.grass.hit"));
+pub static GRASS_FALL: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.grass.fall"));
 
 fn register_path(path: &str) -> SoundEvent {
     register_location(ResourceLocation::with_default_namespace(path))

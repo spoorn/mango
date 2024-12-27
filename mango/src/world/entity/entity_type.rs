@@ -14,8 +14,8 @@ use crate::world::phys::vec3::Vec3;
 use bon::Builder;
 use std::sync::{Arc, OnceLock};
 
-pub static OCELOT: OnceLock<Indexed<Arc<EntityType>>> = OnceLock::new();
-pub static PARROT: OnceLock<Indexed<Arc<EntityType>>> = OnceLock::new();
+pub static OCELOT: OnceLock<Indexed<EntityType>> = OnceLock::new();
+pub static PARROT: OnceLock<Indexed<EntityType>> = OnceLock::new();
 
 pub fn bootstrap() {
     OCELOT.get_or_init(|| {
@@ -84,7 +84,7 @@ pub fn vanilla_entity_id(path: &str) -> ResourceKey {
     )
 }
 
-pub fn register(path: &str, entity_type: EntityType) -> Indexed<Arc<EntityType>> {
+pub fn register(path: &str, entity_type: EntityType) -> Indexed<EntityType> {
     registry::register_key(
         built_in_registries::entity_type_registry(),
         vanilla_entity_id(path),

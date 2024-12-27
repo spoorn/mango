@@ -3,8 +3,17 @@ use crate::world::phys::shapes::shapes;
 use crate::world::phys::shapes::voxel_shape::VoxelShapeTrait;
 use std::borrow::Borrow;
 use std::fmt::Debug;
+use std::sync::Arc;
 
 pub trait BlockTrait: BlockBehaviour + Send + Sync + Debug {}
+
+impl<T: BlockTrait> BlockBehaviour for Arc<T> {
+    fn get_block(&self) -> &Block {
+        (**self).get_block()
+    }
+}
+
+impl<T: BlockTrait> BlockTrait for Arc<T> {}
 
 #[derive(Debug)]
 pub struct Block {

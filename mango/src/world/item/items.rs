@@ -4,28 +4,35 @@ use crate::resources::resource_key::ResourceKey;
 use crate::world::item::block_item::BlockItem;
 use crate::world::item::item::{ItemTrait, Properties, PropertiesBuilder};
 use crate::world::level::block::block::BlockTrait;
-use std::sync::Arc;
+use crate::world::level::block::blocks;
+use std::sync::{Arc, OnceLock};
+
+pub static JUNGLE_LEAVES: OnceLock<Indexed<BlockItem>> = OnceLock::new();
+
+pub fn bootstrap() {
+    JUNGLE_LEAVES.get_or_init(|| register_block(blocks::JUNGLE_LEAVES.get().unwrap().clone()));
+}
 
 fn block_id_to_item_id(block_key: &ResourceKey) -> ResourceKey {
     ResourceKey::create(&registries::ITEM, block_key.location.clone())
 }
 
-pub fn register_block<T: BlockTrait>(block: Indexed<Arc<T>>) -> Indexed<Arc<BlockItem>> {
+pub fn register_block<T: BlockTrait>(block: Indexed<T>) -> Indexed<BlockItem> {
     register_block_item_with_fn(block, BlockItem::new)
 }
 
 pub fn register_block_item_with_fn<T: BlockTrait, O: ItemTrait + 'static>(
-    block: Indexed<Arc<T>>,
-    item_fn: fn(Indexed<Arc<T>>, Properties) -> O,
-) -> Indexed<Arc<O>> {
+    block: Indexed<T>,
+    item_fn: fn(Indexed<T>, Properties) -> O,
+) -> Indexed<O> {
     register_block_item_with_properties(block, item_fn, Properties::builder())
 }
 
 pub fn register_block_item_with_properties<T: BlockTrait, O: ItemTrait + 'static>(
-    block: Indexed<Arc<T>>,
-    item_fn: fn(Indexed<Arc<T>>, Properties) -> O,
+    block: Indexed<T>,
+    item_fn: fn(Indexed<T>, Properties) -> O,
     properties: PropertiesBuilder,
-) -> Indexed<Arc<O>> {
+) -> Indexed<O> {
     register(
         block_id_to_item_id(&built_in_registries::block_registry().key),
         |prop| item_fn(block, prop),
@@ -37,7 +44,7 @@ pub fn register<T: ItemTrait + 'static>(
     key: ResourceKey,
     item_fn: impl FnOnce(Properties) -> T,
     mut properties: Properties,
-) -> Indexed<Arc<T>> {
+) -> Indexed<T> {
     properties.id = Some(key.clone());
     let item = Arc::new(item_fn(properties));
     // TODO: Use BlockItem::register_blocks

@@ -32,6 +32,15 @@ pub static BAMBOO_SAPLING: LazyLock<SoundType> = LazyLock::new(|| SoundType {
     hit_sound: sound_events::BAMBOO_SAPLING_HIT.clone(),
     fall_sound: sound_events::BAMBOO_FALL.clone(),
 });
+pub static GRASS: LazyLock<SoundType> = LazyLock::new(|| SoundType {
+    volume: 1.0,
+    pitch: 1.0,
+    break_sound: sound_events::GRASS_BREAK.clone(),
+    step_sound: sound_events::GRASS_STEP.clone(),
+    place_sound: sound_events::GRASS_PLACE.clone(),
+    hit_sound: sound_events::GRASS_HIT.clone(),
+    fall_sound: sound_events::GRASS_FALL.clone(),
+});
 
 #[derive(Clone, Debug)]
 pub struct SoundType {

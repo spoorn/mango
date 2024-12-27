@@ -1,4 +1,4 @@
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub enum PushReaction {
     #[default]
     Normal,

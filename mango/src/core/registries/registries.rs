@@ -3,6 +3,7 @@ use crate::resources::resource_location::ResourceLocation;
 use std::sync::LazyLock;
 
 pub static BLOCK: LazyLock<ResourceKey> = LazyLock::new(|| create_default_registry_key("block"));
+pub static ITEM: LazyLock<ResourceKey> = LazyLock::new(|| create_default_registry_key("item"));
 pub static SOUND_EVENT: LazyLock<ResourceKey> =
     LazyLock::new(|| create_default_registry_key("sound_event"));
 

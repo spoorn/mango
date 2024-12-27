@@ -4,13 +4,14 @@ use crate::core::registries::registries;
 use crate::core::registries::registries::root_registry_name;
 use crate::resources::resource_key::ResourceKey;
 use crate::sounds::sound_event::SoundEvent;
+use crate::world::item::item::ItemTrait;
 use crate::world::level::block::block::BlockTrait;
 use std::fmt::Debug;
 use std::sync::{Arc, OnceLock};
 
-// TODO: Optimize and remove RwLock?
 pub static REGISTRY: OnceLock<MappedRegistry<Arc<dyn Registry>>> = OnceLock::new();
 pub static BLOCK: OnceLock<Arc<MappedRegistry<Arc<dyn BlockTrait>>>> = OnceLock::new();
+pub static ITEM: OnceLock<Arc<MappedRegistry<Arc<dyn ItemTrait>>>> = OnceLock::new();
 // TODO: does SoundEvent need to be wrapped around Arc? They seem to be immutable so maybe we just copy everywhere
 pub static SOUND_EVENT: OnceLock<Arc<MappedRegistry<SoundEvent>>> = OnceLock::new();
 
@@ -20,6 +21,16 @@ pub fn registry() -> &'static MappedRegistry<Arc<dyn Registry>> {
 
 pub fn block_registry() -> Arc<MappedRegistry<Arc<dyn BlockTrait>>> {
     Arc::clone(BLOCK.get().unwrap())
+}
+
+pub fn get_block(id: usize) -> Option<Arc<dyn BlockTrait>> {
+    (block_registry()
+        as Arc<dyn WritableRegistry<Arc<dyn BlockTrait>, Result = Arc<dyn BlockTrait>>>)
+        .get(id)
+}
+
+pub fn item_registry() -> Arc<MappedRegistry<Arc<dyn ItemTrait>>> {
+    Arc::clone(ITEM.get().unwrap())
 }
 
 pub fn sound_event_registry() -> Arc<MappedRegistry<SoundEvent>> {
@@ -34,6 +45,7 @@ pub fn bootstrap() {
         )
     });
     BLOCK.get_or_init(|| register_defaulted_with_intrusive_holders(registries::BLOCK.clone()));
+    ITEM.get_or_init(|| register_defaulted_with_intrusive_holders(registries::ITEM.clone()));
     SOUND_EVENT.get_or_init(|| register_simple(registries::SOUND_EVENT.clone()));
 }
 

@@ -11,6 +11,20 @@ pub static WOOL_STEP: LazyLock<SoundEvent> = LazyLock::new(|| register_path("blo
 pub static WOOL_PLACE: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.wool.place"));
 pub static WOOL_HIT: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.wool.hit"));
 pub static WOOL_FALL: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.wool.fall"));
+pub static COBWEB_BREAK: LazyLock<SoundEvent> =
+    LazyLock::new(|| register_path("block.cobweb.break"));
+pub static COBWEB_STEP: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.cobweb.step"));
+pub static COBWEB_PLACE: LazyLock<SoundEvent> =
+    LazyLock::new(|| register_path("block.cobweb.place"));
+pub static COBWEB_HIT: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.cobweb.hit"));
+pub static COBWEB_FALL: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.cobweb.fall"));
+pub static BAMBOO_SAPLING_BREAK: LazyLock<SoundEvent> =
+    LazyLock::new(|| register_path("block.bamboo_sapling.break"));
+pub static BAMBOO_STEP: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo.step"));
+pub static BAMBOO_SAPLING_PLACE: LazyLock<SoundEvent> =
+    LazyLock::new(|| register_path("block.bamboo_sapling.place"));
+pub static BAMBOO_SAPLING_HIT: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo_sapling.hit"));
+pub static BAMBOO_FALL: LazyLock<SoundEvent> = LazyLock::new(|| register_path("block.bamboo.fall"));
 
 fn register_path(path: &str) -> SoundEvent {
     register_location(ResourceLocation::with_default_namespace(path))

@@ -1,17 +1,27 @@
-use crate::world::level::block::block::BlockTrait;
+use crate::world::level::block::block::{Block, BlockTrait};
 use crate::world::level::block::blocks;
-use crate::world::level::block::state::block_behavior;
+use crate::world::level::block::state::block_behavior::{BlockBehaviour, Properties};
 use dashmap::DashMap;
 
 #[derive(Debug)]
 pub struct FireBlock {
+    block: Block,
     pub ignite_odds: DashMap<usize, u32>,
     pub burn_odds: DashMap<usize, u32>,
 }
 
+impl BlockBehaviour for FireBlock {
+    fn get_block(&self) -> &Block {
+        &self.block
+    }
+}
+
+impl BlockTrait for FireBlock {}
+
 impl FireBlock {
-    pub fn new(properties: block_behavior::Properties) -> Self {
+    pub fn new(properties: Properties) -> Self {
         Self {
+            block: Block::new(properties),
             ignite_odds: DashMap::new(),
             burn_odds: DashMap::new(),
         }
@@ -22,8 +32,6 @@ impl FireBlock {
         self.burn_odds.insert(block_id, burn_odds);
     }
 }
-
-impl BlockTrait for FireBlock {}
 
 pub fn bootstrap() {
     let fire_block = blocks::FIRE.get().unwrap();

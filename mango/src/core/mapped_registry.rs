@@ -1,6 +1,7 @@
 use crate::core::registration_info::RegistrationInfo;
 use crate::resources::resource_key::ResourceKey;
 use crate::resources::resource_location::ResourceLocation;
+use crate::world::item::item::ItemTrait;
 use crate::world::level::block::block::BlockTrait;
 use dashmap::DashMap;
 use std::fmt::Debug;
@@ -31,7 +32,11 @@ impl Lifecycle {
 pub trait Registry: Send + Sync + Debug {}
 
 pub trait WritableRegistry<T> {
+    type Result;
+
     fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo) -> usize;
+
+    fn get(&self, index: usize) -> Option<Self::Result>;
 
     fn key(&self) -> &ResourceKey;
 }
@@ -75,8 +80,12 @@ impl<T> MappedRegistry<T> {
 
 impl<T: Send + Sync + Debug> Registry for MappedRegistry<T> {}
 
+/// Writable Registry that assumes the value is a cloneable reference pointer (e.g. Arc).
+///
 /// https://www.reddit.com/r/rust/comments/droxdg/why_arent_traits_impld_for_boxdyn_trait/
-impl<T> WritableRegistry<T> for MappedRegistry<T> {
+impl<T: Clone> WritableRegistry<T> for MappedRegistry<T> {
+    type Result = T;
+
     fn register(&self, key: ResourceKey, value: T, registration_info: RegistrationInfo) -> usize {
         self.validate_write(&key);
         if self.by_location.contains_key(&key.location) {
@@ -103,6 +112,10 @@ impl<T> WritableRegistry<T> for MappedRegistry<T> {
         // })
     }
 
+    fn get(&self, index: usize) -> Option<Self::Result> {
+        self.values.read().unwrap().get(index).cloned()
+    }
+
     fn key(&self) -> &ResourceKey {
         &self.key
     }
@@ -119,16 +132,51 @@ impl<T> WritableRegistry<T> for MappedRegistry<T> {
 /// This allows callers to use trait generics instead of trait objects. For example,
 /// see [crate::core::registry::register_key].
 impl<T: BlockTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dyn BlockTrait>> {
+    type Result = Arc<dyn BlockTrait>;
+
     fn register(
         &self,
         key: ResourceKey,
         value: Arc<T>,
         registration_info: RegistrationInfo,
     ) -> usize {
-        (self as &dyn WritableRegistry<Arc<dyn BlockTrait>>).register(key, value, registration_info)
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).register(
+            key,
+            value,
+            registration_info,
+        )
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Result> {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).get(index)
     }
 
     fn key(&self) -> &ResourceKey {
-        (self as &dyn WritableRegistry<Arc<dyn BlockTrait>>).key()
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).key()
+    }
+}
+
+impl<T: ItemTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dyn ItemTrait>> {
+    type Result = Arc<dyn ItemTrait>;
+
+    fn register(
+        &self,
+        key: ResourceKey,
+        value: Arc<T>,
+        registration_info: RegistrationInfo,
+    ) -> usize {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).register(
+            key,
+            value,
+            registration_info,
+        )
+    }
+
+    fn get(&self, index: usize) -> Option<Self::Result> {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).get(index)
+    }
+
+    fn key(&self) -> &ResourceKey {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).key()
     }
 }

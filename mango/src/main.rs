@@ -5,6 +5,7 @@ mod packs;
 mod resources;
 mod shared_constants;
 mod sounds;
+mod util;
 mod world;
 
 use tracing::info;

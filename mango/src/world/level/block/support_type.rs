@@ -17,10 +17,11 @@ impl SupportType {
         block_pos: BlockPos,
         direction: Direction,
     ) -> bool {
-        match self {
-            SupportType::Full => false,
-            SupportType::Center => false,
-            SupportType::Rigid => false,
-        }
+        todo!();
+        // match self {
+        //     SupportType::Full => false,
+        //     SupportType::Center => false,
+        //     SupportType::Rigid => false,
+        // }
     }
 }

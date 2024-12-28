@@ -22,10 +22,14 @@ pub fn bootstrap() {
         serde_json::to_string_pretty(&registry).unwrap()
     );
 
+    // Should be impossible
     if built_in_registries::entity_type_registry()
         .get(entity_type::PLAYER.id)
         .is_none()
     {
         panic!("Failed loading EntityTypes");
     }
+    // TODO: EntitySelectorOptions, DispenseItemBehavior, CauldronInteraction
+    // TODO: BuiltInRegistries.bootStrap() may not be necessary
+    // TODO: CreativeModeTabs
 }

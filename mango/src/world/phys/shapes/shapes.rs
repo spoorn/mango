@@ -21,5 +21,6 @@ pub fn block() -> Box<dyn VoxelShapeTrait> {
 
 // TODO: implement
 pub fn join_is_not_empty(s1: &dyn VoxelShapeTrait, s2: &dyn VoxelShapeTrait) -> bool {
-    s1.equals(s2)
+    todo!();
+    //s1.equals(s2)
 }

@@ -45,8 +45,3 @@ fn register_location(location: ResourceLocation) -> SoundEvent {
     );
     sound_event
 }
-
-// TODO: Not needed
-// fn register(location: ResourceLocation, variable_range_location: ResourceLocation) {
-//
-// }

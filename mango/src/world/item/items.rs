@@ -1,16 +1,17 @@
 use crate::core::registries::built_in_registries;
-use crate::core::{registries::registries, registry, Indexed};
+use crate::core::{registries::registries, registry, GlobalIndexed, Indexed};
 use crate::resources::resource_key::ResourceKey;
 use crate::world::item::block_item::BlockItem;
 use crate::world::item::item::{ItemTrait, Properties, PropertiesBuilder};
 use crate::world::level::block::block::BlockTrait;
 use crate::world::level::block::blocks;
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 
-pub static JUNGLE_LEAVES: OnceLock<Indexed<BlockItem>> = OnceLock::new();
+pub static JUNGLE_LEAVES: GlobalIndexed<BlockItem> =
+    GlobalIndexed::new(|| register_block(blocks::JUNGLE_LEAVES.clone()));
 
 pub fn bootstrap() {
-    JUNGLE_LEAVES.get_or_init(|| register_block(blocks::JUNGLE_LEAVES.get().unwrap().clone()));
+    JUNGLE_LEAVES.init();
 }
 
 fn block_id_to_item_id(block_key: &ResourceKey) -> ResourceKey {

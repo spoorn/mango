@@ -12,7 +12,7 @@ use tracing::info;
 pub static COMPOSTABLES: LazyLock<DashMap<usize, f32>> = LazyLock::new(|| DashMap::new());
 
 pub fn bootstrap() {
-    add(0.3, items::JUNGLE_LEAVES.get().unwrap());
+    add(0.3, &items::JUNGLE_LEAVES);
     info!("Loaded compostables: {:#?}", COMPOSTABLES);
 }
 

@@ -36,6 +36,6 @@ impl FireBlock {
 }
 
 pub fn bootstrap() {
-    let fire_block = blocks::FIRE.get().unwrap();
+    let fire_block = &blocks::FIRE;
     fire_block.set_flammable(1, 5, 20);
 }

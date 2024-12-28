@@ -1,6 +1,6 @@
 use crate::core::block_pos::BlockPos;
 use crate::core::registries::{built_in_registries, registries};
-use crate::core::{registry, Indexed};
+use crate::core::{registry, GlobalIndexed, Indexed};
 use crate::resources::resource_key::ResourceKey;
 use crate::resources::resource_location::ResourceLocation;
 use crate::world::entity::entity_type;
@@ -15,69 +15,69 @@ use crate::world::level::block::web_block::WebBlock;
 use crate::world::level::block_getter::BlockGetter;
 use crate::world::level::material::map_color;
 use crate::world::level::material::push_reaction::PushReaction;
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 
-pub static FIRE: OnceLock<Indexed<FireBlock>> = OnceLock::new();
-pub static COBWEB: OnceLock<Indexed<WebBlock>> = OnceLock::new();
-pub static BAMBOO_SAPLING: OnceLock<Indexed<BambooSaplingBlock>> = OnceLock::new();
-pub static JUNGLE_LEAVES: OnceLock<Indexed<LeavesBlock>> = OnceLock::new();
+pub static FIRE: GlobalIndexed<FireBlock> = GlobalIndexed::new(|| {
+    register_block(
+        "fire",
+        FireBlock::new,
+        Properties::builder()
+            .map_color(|_| map_color::FIRE)
+            .replaceable(true)
+            .no_collision()
+            .instabreak()
+            .light_level(|_| 15)
+            .sound_type(sound_type::WOOL.clone())
+            .push_reaction(PushReaction::Destroy)
+            .build(),
+    )
+});
+pub static COBWEB: GlobalIndexed<WebBlock> = GlobalIndexed::new(|| {
+    register_block(
+        "cobweb",
+        WebBlock::new,
+        Properties::builder()
+            .map_color(|_| map_color::WOOL)
+            .no_collision()
+            .force_solid_on(true)
+            .sound_type(sound_type::COBWEB.clone())
+            .requires_correct_tool_for_drops(true)
+            .strength(4.0)
+            .push_reaction(PushReaction::Destroy)
+            .build(),
+    )
+});
+pub static BAMBOO_SAPLING: GlobalIndexed<BambooSaplingBlock> = GlobalIndexed::new(|| {
+    register_block(
+        "bamboo_sapling",
+        BambooSaplingBlock::new,
+        Properties::builder()
+            .map_color(|_| map_color::WOOD)
+            .force_solid_on(true)
+            .random_ticks()
+            .no_collision()
+            // Note: vanilla has a bug here where it also sets instabreak
+            .strength(1.0)
+            .sound_type(sound_type::BAMBOO_SAPLING.clone())
+            .offset_type(OffsetType::XZ)
+            .ignited_by_lava(true)
+            .push_reaction(PushReaction::Destroy)
+            .build(),
+    )
+});
+pub static JUNGLE_LEAVES: GlobalIndexed<LeavesBlock> = GlobalIndexed::new(|| {
+    register_block(
+        "jungle_leaves",
+        LeavesBlock::new,
+        leaves_properties(sound_type::GRASS.clone()),
+    )
+});
 
 pub fn bootstrap() {
-    FIRE.get_or_init(|| {
-        register_block(
-            "fire",
-            FireBlock::new,
-            Properties::builder()
-                .map_color(|_| map_color::FIRE)
-                .replaceable(true)
-                .no_collision()
-                .instabreak()
-                .light_level(|_| 15)
-                .sound_type(sound_type::WOOL.clone())
-                .push_reaction(PushReaction::Destroy)
-                .build(),
-        )
-    });
-    COBWEB.get_or_init(|| {
-        register_block(
-            "cobweb",
-            WebBlock::new,
-            Properties::builder()
-                .map_color(|_| map_color::WOOL)
-                .no_collision()
-                .force_solid_on(true)
-                .sound_type(sound_type::COBWEB.clone())
-                .requires_correct_tool_for_drops(true)
-                .strength(4.0)
-                .push_reaction(PushReaction::Destroy)
-                .build(),
-        )
-    });
-    BAMBOO_SAPLING.get_or_init(|| {
-        register_block(
-            "bamboo_sapling",
-            BambooSaplingBlock::new,
-            Properties::builder()
-                .map_color(|_| map_color::WOOD)
-                .force_solid_on(true)
-                .random_ticks()
-                .no_collision()
-                // Note: vanilla has a bug here where it also sets instabreak
-                .strength(1.0)
-                .sound_type(sound_type::BAMBOO_SAPLING.clone())
-                .offset_type(OffsetType::XZ)
-                .ignited_by_lava(true)
-                .push_reaction(PushReaction::Destroy)
-                .build(),
-        )
-    });
-    JUNGLE_LEAVES.get_or_init(|| {
-        register_block(
-            "jungle_leaves",
-            LeavesBlock::new,
-            leaves_properties(sound_type::GRASS.clone()),
-        )
-    });
+    FIRE.init();
+    COBWEB.init();
+    BAMBOO_SAPLING.init();
+    JUNGLE_LEAVES.init();
 }
 
 pub fn vanilla_block_id(path: &str) -> ResourceKey {
@@ -131,6 +131,5 @@ fn ocelot_or_parrot(
     _block_pos: BlockPos,
     entity_type: usize,
 ) -> bool {
-    entity_type == entity_type::OCELOT.get().unwrap().id
-        || entity_type == entity_type::PARROT.get().unwrap().id
+    entity_type == entity_type::OCELOT.id || entity_type == entity_type::PARROT.id
 }

@@ -1,5 +1,5 @@
 use std::ops::Deref;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 pub mod block_pos;
 pub mod direction;
@@ -26,5 +26,24 @@ impl<T> Clone for Indexed<T> {
             id: self.id,
             value: Arc::clone(&self.value),
         }
+    }
+}
+
+/// Global Indexed
+pub struct GlobalIndexed<T, F = fn() -> Indexed<T>>(LazyLock<Indexed<T>, F>);
+impl<T, F: FnOnce() -> Indexed<T>> GlobalIndexed<T, F> {
+    pub const fn new(f: F) -> Self {
+        Self(LazyLock::new(f))
+    }
+
+    pub fn init(&self) -> &Indexed<T> {
+        &*self.0
+    }
+}
+impl<T> Deref for GlobalIndexed<T> {
+    type Target = Indexed<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

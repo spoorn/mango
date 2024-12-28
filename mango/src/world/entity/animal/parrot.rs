@@ -9,7 +9,7 @@ impl Parrot {
         Self {}
     }
 
-    pub fn boxed(entity_type: EntityType, level: Level) -> Box<dyn EntityTrait> {
-        Box::new(Self::new(entity_type, level))
+    pub fn boxed_option(entity_type: EntityType, level: Level) -> Option<Box<dyn EntityTrait>> {
+        Some(Box::new(Self::new(entity_type, level)))
     }
 }

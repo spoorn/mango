@@ -229,8 +229,8 @@ impl BlockState {
     }
 
     pub fn blocks_motion(&self) -> bool {
-        self.block != blocks::COBWEB.get().unwrap().id
-            && self.block != blocks::BAMBOO_SAPLING.get().unwrap().id
+        self.block != blocks::COBWEB.id
+            && self.block != blocks::BAMBOO_SAPLING.id
             && self.is_solid()
     }
 

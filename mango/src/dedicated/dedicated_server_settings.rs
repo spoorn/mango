@@ -1,4 +1,5 @@
 use crate::dedicated::dedicated_server_properties::DedicatedServerProperties;
+use std::ops::Deref;
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -17,5 +18,12 @@ impl DedicatedServerSettings {
 
     pub fn force_save(&self) {
         self.properties.store(&self.path);
+    }
+}
+impl Deref for DedicatedServerSettings {
+    type Target = DedicatedServerProperties;
+
+    fn deref(&self) -> &Self::Target {
+        &self.properties
     }
 }

@@ -10,6 +10,7 @@ mod util;
 mod world;
 
 use crate::dedicated::dedicated_server_settings::DedicatedServerSettings;
+use crate::world::level::storage::level_storage_source::LevelStorageSource;
 use tracing::info;
 
 async fn setup_logging() {
@@ -35,5 +36,8 @@ async fn main() {
     let properties = DedicatedServerSettings::new("server.properties");
     info!("Loaded server properties: {:#?}", properties);
     properties.force_save();
-    // TODO: RegionFileVersion, EULA
+    // TODO: RegionFileVersion, EULA, YggdrasilAuthenticationService
+    let level_storage_source = LevelStorageSource::create_default(properties.universe.clone());
+    let level_storage_access =
+        level_storage_source.validate_and_create_access(properties.level_name.clone());
 }

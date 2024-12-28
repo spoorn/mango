@@ -9,11 +9,16 @@ use tracing::{error, warn};
 
 // TODO: implement all properties
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub struct DedicatedServerProperties {
-    #[serde(rename = "server-ip")]
-    server_ip: String,
-    #[serde(rename = "server-port")]
-    server_port: u16,
+    pub server_ip: String,
+    pub server_port: u16,
+    /// Root of the Minecraft world instance
+    #[serde(default = "default_universe")]
+    pub universe: String,
+    /// Minecraft world name, and name of the world folder
+    #[serde(default = "default_level_name")]
+    pub level_name: String,
 }
 impl DedicatedServerProperties {
     pub fn from_file(path: impl Into<PathBuf>) -> Self {
@@ -52,6 +57,25 @@ impl Default for DedicatedServerProperties {
         Self {
             server_ip: "".to_string(),
             server_port: 25565,
+            universe: ".".to_string(),
+            level_name: "world".to_string(),
         }
     }
+}
+
+/*
+    Serde does not support default literals or expressions: https://github.com/serde-rs/serde/issues/368.
+    This is a workaround to specify a tiny function for each. We need these default values as these
+    are not required as part of the server.properties file and can instead be command args, but we
+    don't want to break deserialization or skip it.
+
+    We also don't yet support command line args.
+*/
+
+fn default_universe() -> String {
+    ".".to_string()
+}
+
+fn default_level_name() -> String {
+    "world".to_string()
 }

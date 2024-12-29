@@ -9,8 +9,11 @@ resolver = "2"
 edition = "2021"
 
 [workspace.dependencies]
+anyhow = "1.0"
+async-compression = { version = "0.4", features = ["tokio", "gzip"] }
 bon = "3"
 bytes = "1"
+cesu8 = "1.1"
 dashmap = { version = "6", features = ["serde"] }
 encoding_rs = "0.8"
 fs4 = "0.12"

@@ -4,8 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = { workspace = true }
+async-compression = { workspace = true }
 bon = { workspace = true }
 bytes = { workspace = true }
+cesu8 = { workspace = true }
 dashmap = { workspace = true }
 encoding_rs = { workspace = true }
 fs4 = { workspace = true }

@@ -3,7 +3,9 @@
 
 use crate::shared_constants;
 use crate::util::datafix::data_fix::DataFix;
+use crate::util::datafix::data_fix_types::DataFixTypes;
 use crate::util::datafix::schema::Schema;
+use crate::util::datafix::serialization::dynamic::Dynamic;
 use bon::Builder;
 use std::collections::{BTreeSet, HashMap};
 use std::sync::{Arc, LazyLock};
@@ -12,7 +14,7 @@ pub static DATA_FIXER: LazyLock<Arc<DataFixer>> = LazyLock::new(|| {
     // TODO: Add fixers
     Arc::new(
         DataFixer::builder()
-            .data_version(shared_constants::WORLD_VERSION.world_version.version)
+            .data_version(shared_constants::get_current_data_version())
             .build(),
     )
 });
@@ -25,7 +27,22 @@ pub struct DataFixer {
     global_list: Vec<DataFix>,
     #[builder(field)]
     fixer_versions: BTreeSet<u32>,
-    data_version: u32,
+    data_version: i32,
+}
+impl DataFixer {
+    pub fn update<T>(
+        &self,
+        data_fix_type: &DataFixTypes,
+        input: Dynamic<T>,
+        version: i32,
+        new_version: i32,
+    ) -> Dynamic<T> {
+        if version < new_version {
+            todo!();
+        } else {
+            input
+        }
+    }
 }
 
 pub fn get_data_fixer() -> Arc<DataFixer> {

@@ -1,5 +1,6 @@
 use crate::nbt::compound_tag::CompoundTag;
 use crate::nbt::end_tag::EndTag;
+use crate::nbt::list_tag::ListTag;
 use serde::Serialize;
 use strum::EnumTryAs;
 
@@ -17,7 +18,7 @@ pub enum Tag {
     DoubleTag(f64),
     ByteArrayTag(Vec<u8>),
     StringTag(String),
-    ListTag(Vec<Tag>),
+    ListTag(ListTag),
     CompoundTag(CompoundTag),
     IntArrayTag(Vec<i32>),
     LongArrayTag(Vec<i64>),

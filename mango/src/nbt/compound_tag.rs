@@ -1,3 +1,4 @@
+use crate::nbt::list_tag::ListTag;
 use crate::nbt::nbt_accounter::NbtAccounter;
 use crate::nbt::tag::Tag;
 use crate::nbt::tag_type::TagType;
@@ -131,6 +132,24 @@ impl CompoundTag {
         self.get_bool_or_default(tag, false)
     }
 
+    pub fn get_list(&self, tag: impl AsRef<str>) -> ListTag {
+        if self.contains(&tag, TagType::ListTag) {
+            return self
+                .tags
+                .get(tag.as_ref())
+                .unwrap()
+                .value()
+                .try_as_list_tag_ref()
+                .unwrap()
+                .clone();
+        }
+        ListTag::default()
+    }
+
+    pub fn try_get_list(&self, tag: impl AsRef<str>) -> Option<ListTag> {
+        Some(self.tags.get(tag.as_ref())?.try_as_list_tag_ref()?.clone())
+    }
+
     pub fn get_compound<'a>(&self, tag: impl AsRef<str>) -> CompoundTag {
         // TODO: crash report
         if self.contains(&tag, TagType::CompoundTag) {
@@ -143,5 +162,14 @@ impl CompoundTag {
                 .clone();
         }
         Self::default()
+    }
+
+    pub fn try_get_compound<'a>(&self, tag: impl AsRef<str>) -> Option<CompoundTag> {
+        Some(
+            self.tags
+                .get(tag.as_ref())?
+                .try_as_compound_tag_ref()?
+                .clone(),
+        )
     }
 }

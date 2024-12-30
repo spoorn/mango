@@ -30,7 +30,7 @@ pub struct DataFixer {
     data_version: i32,
 }
 impl DataFixer {
-    pub fn update<T>(
+    pub fn update<T: Clone>(
         &self,
         data_fix_type: &DataFixTypes,
         input: Dynamic<T>,
@@ -38,7 +38,7 @@ impl DataFixer {
         new_version: i32,
     ) -> Dynamic<T> {
         if version < new_version {
-            todo!();
+            todo!("Data Fixer is not yet supported");
         } else {
             input
         }

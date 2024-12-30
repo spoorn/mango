@@ -24,7 +24,7 @@ pub enum DataFixTypes {
     EntityChunk,
 }
 impl DataFixTypes {
-    pub fn update<T>(
+    pub fn update<T: Clone>(
         &self,
         data_fixer: &DataFixer,
         input: Dynamic<T>,
@@ -34,7 +34,7 @@ impl DataFixTypes {
         data_fixer.update(self, input, version, new_version)
     }
 
-    pub fn update_to_current_version<T>(
+    pub fn update_to_current_version<T: Clone>(
         &self,
         data_fixer: &DataFixer,
         input: Dynamic<T>,

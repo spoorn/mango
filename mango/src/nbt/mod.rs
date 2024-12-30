@@ -4,7 +4,7 @@ use tokio::io::BufReader;
 
 pub mod compound_tag;
 mod end_tag;
-mod list_tag;
+pub mod list_tag;
 pub mod nbt_accounter;
 pub mod nbt_io;
 pub mod nbt_ops;

@@ -1,4 +1,5 @@
 mod bootstrap;
+mod codec;
 mod core;
 mod dedicated;
 mod detected_version;

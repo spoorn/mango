@@ -56,6 +56,10 @@ async fn main() {
                     serde_json::to_string_pretty(&data_tag.value).unwrap()
                 );
                 let level_summary = level_storage_access.make_level_summary(&data_tag, false);
+                info!(
+                    "Level summary: {}",
+                    serde_json::to_string_pretty(&level_summary).unwrap()
+                );
             }
             Err(e) => {
                 let level_directory = level_storage_access.level_directory;

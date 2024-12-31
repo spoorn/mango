@@ -1,19 +1,24 @@
 use std::fmt::{Display, Formatter};
 
-pub const LEVEL_DATA_FILE: LevelResource = LevelResource::new("level.dat");
-pub const OLD_LEVEL_DATA_FILE: LevelResource = LevelResource::new("level.dat_old");
-pub const ICON_FILE: LevelResource = LevelResource::new("icon.png");
-
-pub struct LevelResource {
-    pub id: &'static str,
+#[derive(Copy, Clone, Hash, Eq, PartialEq)]
+pub enum LevelResource {
+    LevelDataFile,
+    OldLevelDataFile,
+    IconFile,
+    DatapackDir,
 }
 impl LevelResource {
-    const fn new(id: &'static str) -> Self {
-        Self { id }
+    pub const fn id(&self) -> &str {
+        match self {
+            LevelResource::LevelDataFile => "level.dat",
+            LevelResource::OldLevelDataFile => "level.dat_old",
+            LevelResource::IconFile => "icon.png",
+            LevelResource::DatapackDir => "datapacks",
+        }
     }
 }
 impl Display for LevelResource {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "/{}", self.id)
+        write!(f, "/{}", self.id())
     }
 }

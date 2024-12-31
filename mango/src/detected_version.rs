@@ -1,3 +1,4 @@
+use crate::packs::pack_type::PackType;
 use crate::world::level::storage::data_version::DataVersion;
 use serde::Deserialize;
 
@@ -14,6 +15,14 @@ pub struct WorldVersion {
     pub java_component: String,
     pub stable: bool,
     pub use_editor: bool,
+}
+impl WorldVersion {
+    pub fn get_pack_version(&self, pack_type: PackType) -> u32 {
+        match pack_type {
+            PackType::ClientResources => self.pack_version.resource,
+            PackType::ServerData => self.pack_version.data,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]

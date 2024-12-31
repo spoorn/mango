@@ -5,6 +5,7 @@ mod dedicated;
 mod detected_version;
 mod minecraft_server;
 mod nbt;
+mod network;
 mod packs;
 mod resources;
 mod shared_constants;
@@ -13,6 +14,7 @@ mod util;
 mod world;
 
 use crate::dedicated::dedicated_server_settings::DedicatedServerSettings;
+use crate::packs::repository::server_packs_source;
 use crate::world::level::storage::level_storage_source::LevelStorageSource;
 use tracing::{error, info, warn};
 
@@ -41,14 +43,15 @@ async fn main() {
     properties.force_save();
     // TODO: RegionFileVersion, EULA, YggdrasilAuthenticationService
     let level_storage_source = LevelStorageSource::create_default(properties.universe.clone());
-    let level_storage_access =
+    let mut level_storage_access =
         level_storage_source.validate_and_create_access(properties.level_name.clone());
 
+    let mut level_data = None;
     if level_storage_access.has_world_data() {
         info!("Loading world data");
         // Note: We don't catch panics here like vanilla and instead rely on returning errors. We'll
         // add error returns as we find any missing ones.
-        let level_data = match level_storage_access
+        level_data = match level_storage_access
             .get_data_tag(false, level_storage_source.get_data_fixer())
             .await
         {
@@ -124,4 +127,15 @@ async fn main() {
             return;
         }
     }
+
+    // TODO: handle safe mode command line arg
+    if properties.safe_mode {
+        warn!("Safe mode active, only vanilla datapack will be loaded");
+    }
+
+    let pack_repository = server_packs_source::create_pack_repository(
+        &level_storage_source,
+        &mut level_storage_access,
+    );
+    info!("Pack Repository: {:#?}", pack_repository);
 }

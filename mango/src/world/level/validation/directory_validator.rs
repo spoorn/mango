@@ -4,6 +4,7 @@ use walkdir::WalkDir;
 
 type PathMatcher = fn(&PathBuf) -> bool;
 
+#[derive(Copy, Clone, Debug)]
 pub struct DirectoryValidator {
     symlink_target_allowlist: PathMatcher,
 }

@@ -19,6 +19,9 @@ pub struct DedicatedServerProperties {
     /// Minecraft world name, and name of the world folder
     #[serde(default = "default_level_name")]
     pub level_name: String,
+    /// true to use vanilla datapacks only, else false
+    #[serde(default)]
+    pub safe_mode: bool,
 }
 impl DedicatedServerProperties {
     pub fn from_file(path: impl Into<PathBuf>) -> Self {
@@ -59,6 +62,7 @@ impl Default for DedicatedServerProperties {
             server_port: 25565,
             universe: ".".to_string(),
             level_name: "world".to_string(),
+            safe_mode: false,
         }
     }
 }

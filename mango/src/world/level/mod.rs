@@ -7,5 +7,5 @@ pub mod level;
 mod level_settings;
 mod material;
 pub mod storage;
-mod validation;
+pub mod validation;
 mod world_data_configuration;

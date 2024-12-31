@@ -17,6 +17,8 @@ cesu8 = "1.1"
 dashmap = { version = "6", features = ["serde"] }
 encoding_rs = "0.8"
 fs4 = "0.12"
+include_dir = "0.7"
+indexmap = "2"
 jiff = "0.1"
 num = "0.4"
 serde = { version = "1.0", features = ["derive", "rc"] }
@@ -28,4 +30,5 @@ tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json"] }
 typetag = "0.2"
+url = "2"
 walkdir = "2"

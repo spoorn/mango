@@ -12,6 +12,8 @@ cesu8 = { workspace = true }
 dashmap = { workspace = true }
 encoding_rs = { workspace = true }
 fs4 = { workspace = true }
+include_dir = { workspace = true }
+indexmap = { workspace = true }
 jiff = { workspace = true }
 num = { workspace = true }
 serde = { workspace = true }
@@ -24,3 +26,4 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 typetag = { workspace = true }
 walkdir = { workspace = true }
+url = { workspace = true }

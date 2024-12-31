@@ -9,13 +9,13 @@ use crate::util::datafix::serialization::dynamic::Dynamic;
 use crate::util::directory_lock::DirectoryLock;
 use crate::world::flag::feature_flags;
 use crate::world::level::level_settings::LevelSettings;
-use crate::world::level::storage::level_resource;
 use crate::world::level::storage::level_resource::LevelResource;
 use crate::world::level::storage::level_summary::LevelSummary;
 use crate::world::level::storage::level_version::LevelVersion;
 use crate::world::level::validation::directory_validator::DirectoryValidator;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
 use anyhow::Result;
+use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -27,7 +27,7 @@ pub struct LevelStorageSource {
     base_dir: PathBuf,
     backup_dir: PathBuf,
     fixer_upper: Arc<DataFixer>,
-    world_dir_validator: DirectoryValidator,
+    pub world_dir_validator: DirectoryValidator,
 }
 impl LevelStorageSource {
     pub fn new(
@@ -129,19 +129,19 @@ impl LevelDirectory {
     }
 
     pub fn data_file(&self) -> PathBuf {
-        self.resource_path(level_resource::LEVEL_DATA_FILE)
+        self.resource_path(LevelResource::LevelDataFile)
     }
 
     pub fn old_data_file(&self) -> PathBuf {
-        self.resource_path(level_resource::OLD_LEVEL_DATA_FILE)
+        self.resource_path(LevelResource::OldLevelDataFile)
     }
 
     fn resource_path(&self, level_resource: LevelResource) -> PathBuf {
-        self.path.join(level_resource.id)
+        self.path.join(level_resource.id())
     }
 
     pub fn icon_file(&self) -> PathBuf {
-        self.resource_path(level_resource::ICON_FILE)
+        self.resource_path(LevelResource::IconFile)
     }
 }
 
@@ -149,6 +149,7 @@ pub struct LevelStorageAccess {
     lock: DirectoryLock,
     pub level_directory: LevelDirectory,
     level_id: String,
+    resources: HashMap<LevelResource, PathBuf>,
 }
 impl LevelStorageAccess {
     pub fn new(level_id: String, level_directory: PathBuf) -> Self {
@@ -156,7 +157,15 @@ impl LevelStorageAccess {
             lock: DirectoryLock::create(level_directory.clone()),
             level_directory: LevelDirectory::new(level_directory),
             level_id,
+            resources: HashMap::new(),
         }
+    }
+
+    pub fn get_level_path(&mut self, level_resource: LevelResource) -> PathBuf {
+        self.resources
+            .entry(level_resource)
+            .or_insert_with(|| self.level_directory.resource_path(level_resource))
+            .clone()
     }
 
     pub fn has_world_data(&self) -> bool {

@@ -4,6 +4,7 @@ use crate::core::registries::built_in_registries::registry;
 use crate::world::entity::entity_type;
 use crate::world::item::items;
 use crate::world::level::block::{blocks, composter_block, fire_block};
+use crate::world::level::game_rules;
 use tracing::info;
 
 pub fn bootstrap() {
@@ -29,6 +30,9 @@ pub fn bootstrap() {
     {
         panic!("Failed loading EntityTypes");
     }
+
+    game_rules::bootstrap();
+
     // TODO: EntitySelectorOptions, DispenseItemBehavior, CauldronInteraction
     // TODO: BuiltInRegistries.bootStrap() may not be necessary
     // TODO: CreativeModeTabs

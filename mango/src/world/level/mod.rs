@@ -1,7 +1,10 @@
 pub mod block;
 pub mod block_getter;
 mod data_pack_config;
+pub mod game_rules;
+mod game_type;
 pub mod level;
+mod level_settings;
 mod material;
 pub mod storage;
 mod validation;

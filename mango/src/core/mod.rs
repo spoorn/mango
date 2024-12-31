@@ -47,3 +47,21 @@ impl<T> Deref for GlobalIndexed<T> {
         &self.0
     }
 }
+
+pub struct Global<T, F = fn() -> T>(LazyLock<T, F>);
+impl<T, F: FnOnce() -> T> Global<T, F> {
+    pub const fn new(f: F) -> Self {
+        Self(LazyLock::new(f))
+    }
+
+    pub fn init(&self) -> &T {
+        &*self.0
+    }
+}
+impl<T> Deref for Global<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

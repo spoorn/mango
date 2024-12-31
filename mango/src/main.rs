@@ -3,6 +3,7 @@ mod codec;
 mod core;
 mod dedicated;
 mod detected_version;
+mod minecraft_server;
 mod nbt;
 mod packs;
 mod resources;

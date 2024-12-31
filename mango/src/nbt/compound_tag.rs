@@ -121,6 +121,13 @@ impl CompoundTag {
         self.get_string_or_default(tag, String::new())
     }
 
+    pub fn try_get_string(&self, tag: impl AsRef<str>) -> Option<String> {
+        self.tags
+            .get(tag.as_ref())?
+            .try_as_string_tag_ref()
+            .cloned()
+    }
+
     pub fn get_bool_or_default(&self, tag: impl AsRef<str>, default: bool) -> bool {
         if self.contains(&tag, TagType::ByteTag) {
             return self.tags.get(tag.as_ref()).unwrap().value().get_as_int() != 0;

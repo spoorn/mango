@@ -205,6 +205,10 @@ impl LevelStorageAccess {
         )
         .await
     }
+
+    pub fn restore_level_data_from_old(&self) -> bool {
+        todo!("Restoring level data from old is not yet supported. This means the level data is corrupted but the old level data is valid.");
+    }
 }
 
 pub fn read_data_config(dynamic: &Dynamic<CompoundTag>) -> WorldDataConfiguration {

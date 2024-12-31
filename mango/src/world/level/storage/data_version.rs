@@ -20,6 +20,10 @@ impl DataVersion {
     pub fn new(version: i32, series: String) -> Self {
         Self { version, series }
     }
+
+    pub fn is_compatible(&self, other: &DataVersion) -> bool {
+        self.series == other.series
+    }
 }
 
 pub fn main_series() -> String {

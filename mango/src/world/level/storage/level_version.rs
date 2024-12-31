@@ -11,7 +11,7 @@ pub struct LevelVersion {
     pub level_data_version: i32,
     last_played: i64,
     minecraft_version_name: String,
-    minecraft_version: DataVersion,
+    pub minecraft_version: DataVersion,
     snapshot: bool,
 }
 impl LevelVersion {

@@ -14,7 +14,7 @@ mod world;
 
 use crate::dedicated::dedicated_server_settings::DedicatedServerSettings;
 use crate::world::level::storage::level_storage_source::LevelStorageSource;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 async fn setup_logging() {
     let subscriber = tracing_subscriber::fmt()
@@ -46,7 +46,9 @@ async fn main() {
 
     if level_storage_access.has_world_data() {
         info!("Loading world data");
-        match level_storage_access
+        // Note: We don't catch panics here like vanilla and instead rely on returning errors. We'll
+        // add error returns as we find any missing ones.
+        let level_data = match level_storage_access
             .get_data_tag(false, level_storage_source.get_data_fixer())
             .await
         {
@@ -60,16 +62,66 @@ async fn main() {
                     "Level summary: {}",
                     serde_json::to_string_pretty(&level_summary).unwrap()
                 );
+                Some((data_tag, level_summary))
             }
             Err(e) => {
-                let level_directory = level_storage_access.level_directory;
                 warn!(
                     ?e,
                     "Failed to load world data from {:?}",
-                    level_directory.data_file()
+                    level_storage_access.level_directory.data_file()
                 );
-                info!("Attempting to use fallback");
+                warn!("Attempting to use fallback");
+
+                match level_storage_access
+                    .get_data_tag(true, level_storage_source.get_data_fixer())
+                    .await
+                {
+                    Ok(data_tag) => {
+                        info!(
+                            "Loaded fallback level data: {}",
+                            serde_json::to_string_pretty(&data_tag.value).unwrap()
+                        );
+                        let level_summary =
+                            level_storage_access.make_level_summary(&data_tag, false);
+                        info!(
+                            "Fallback Level summary: {}",
+                            serde_json::to_string_pretty(&level_summary).unwrap()
+                        );
+                        level_storage_access.restore_level_data_from_old();
+                        Some((data_tag, level_summary))
+                    }
+                    Err(e) => {
+                        error!(
+                            ?e,
+                            "Failed to load fallback world data from {:?}",
+                            level_storage_access.level_directory.old_data_file()
+                        );
+                        error!("Failed to load world data from {:?} and {:?}. World files may be corrupted. Shutting down.",
+                            level_storage_access.level_directory.data_file(),
+                            level_storage_access.level_directory.old_data_file()
+                        );
+                        None
+                    }
+                }
             }
+        };
+
+        if level_data
+            .as_ref()
+            .is_some_and(|(_, level_summary)| level_summary.requires_manual_conversion)
+        {
+            error!(
+                "This world must be opened in an older version (like 1.6.4) to be safely converted"
+            );
+            return;
+        }
+
+        if !level_data
+            .as_ref()
+            .is_some_and(|(_, level_summary)| level_summary.is_compatible())
+        {
+            error!("This world was created by an incompatible version.");
+            return;
         }
     }
 }

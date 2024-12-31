@@ -5,7 +5,7 @@ use crate::world::flag::feature_flag_set::FeatureFlagSet;
 use crate::world::flag::feature_flags;
 use dashmap::DashMap;
 use num::cast::AsPrimitive;
-use serde::{Serialize, Serializer};
+use serde::Serialize;
 use serde_with::SerializeDisplay;
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};

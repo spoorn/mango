@@ -4,6 +4,7 @@ mod commands;
 mod core;
 mod dedicated;
 mod detected_version;
+mod file_util;
 mod minecraft_server;
 mod nbt;
 mod network;
@@ -25,18 +26,41 @@ use crate::world::level::storage::level_storage_source::LevelStorageSource;
 use crate::world::level::storage::level_summary::LevelSummary;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
 use crate::world_loader::{InitConfig, PackConfig};
-use tracing::{error, info, warn};
+use std::fs::OpenOptions;
+use tracing::{error, info, warn, Level};
+use tracing_appender::non_blocking::WorkerGuard;
+use tracing_subscriber::filter::LevelFilter;
+use tracing_subscriber::fmt::writer::MakeWriterExt;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::{fmt, Layer, Registry};
 
-async fn setup_logging() {
-    let subscriber = tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .finish();
+async fn setup_logging() -> WorkerGuard {
+    let log_file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open("logs/latest.log")
+        .expect("Failed to open log file");
+    let (non_blocking, guard) = tracing_appender::non_blocking(log_file);
+    let subscriber = Registry::default()
+        .with(
+            fmt::layer()
+                .with_ansi(true)
+                .with_filter(LevelFilter::from(Level::DEBUG)),
+        )
+        .with(
+            fmt::layer()
+                .with_ansi(false)
+                .with_writer(non_blocking)
+                .with_filter(LevelFilter::from(Level::DEBUG)),
+        );
     tracing::subscriber::set_global_default(subscriber).expect("setting tracing subscriber failed");
+    guard
 }
 
 #[tokio::main]
 async fn main() {
-    setup_logging().await;
+    let _guard = setup_logging().await;
     info!("Hello, world!");
     info!("World version: {:#?}", *shared_constants::WORLD_VERSION);
 
@@ -146,7 +170,7 @@ async fn main() {
         &level_storage_source,
         &mut level_storage_access,
     );
-    info!("Pack Repository: {:#?}", pack_repository);
+    //info!("Pack Repository: {:#?}", pack_repository);
 
     let init_config = load_or_create_config(
         &properties,
@@ -154,7 +178,7 @@ async fn main() {
         properties.safe_mode,
         pack_repository,
     );
-    info!("Init Config: {:#?}", init_config);
+    //info!("Init Config: {:#?}", init_config);
 }
 
 fn load_or_create_config(

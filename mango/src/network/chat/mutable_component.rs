@@ -1,15 +1,16 @@
 use crate::network::chat::component_contents::ComponentContents;
 use crate::network::chat::contents::translatable_contents::TranslatableContents;
 use crate::network::chat::style::Style;
+use std::sync::Arc;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct MutableComponent {
-    contents: Box<dyn ComponentContents>,
+    contents: Arc<dyn ComponentContents>,
     siblings: Vec<MutableComponent>,
     style: Style,
 }
 impl MutableComponent {
-    pub fn create(contents: Box<dyn ComponentContents>) -> Self {
+    pub fn create(contents: Arc<dyn ComponentContents>) -> Self {
         Self {
             contents,
             siblings: Vec::new(),
@@ -18,7 +19,7 @@ impl MutableComponent {
     }
 
     pub fn translatable(keys: &str) -> Self {
-        Self::create(Box::new(TranslatableContents::new(
+        Self::create(Arc::new(TranslatableContents::new(
             keys.to_string(),
             None,
             Vec::new(),

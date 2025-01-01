@@ -30,4 +30,5 @@ Cargo.lock
 # Files generated from server startup
 server.properties
 /world/
+/logs/
 

@@ -1,4 +1,4 @@
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Eq, PartialEq, Clone)]
 pub enum PackSource {
     #[default]
     Default,

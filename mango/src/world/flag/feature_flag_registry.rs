@@ -7,7 +7,7 @@ use std::collections::HashMap;
 pub struct FeatureFlagRegistry {
     pub universe: String,
     pub names: HashMap<ResourceLocation, FeatureFlag>,
-    all_flags: FeatureFlagSet,
+    pub all_flags: FeatureFlagSet,
 }
 
 pub struct FeatureFlagRegistryBuilder {

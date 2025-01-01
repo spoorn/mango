@@ -8,4 +8,11 @@ pub trait Codec {
     fn decode(data: Self::Data) -> Result<Self>
     where
         Self: Sized;
+
+    fn decode_boxed(data: Self::Data) -> Result<Box<Self>>
+    where
+        Self: Sized,
+    {
+        Self::decode(data).map(Box::new)
+    }
 }

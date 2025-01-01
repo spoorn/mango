@@ -1,6 +1,10 @@
-mod built_in_metadata;
-mod metadata;
-mod pack_location_info;
+pub mod abstract_pack_resources;
+pub mod built_in_metadata;
+pub mod metadata;
+pub mod pack_location_info;
+pub mod pack_resources;
+pub mod pack_selection_config;
 pub mod pack_type;
 pub mod repository;
-mod vanilla_pack_resources;
+pub mod resources;
+pub mod vanilla_pack_resources;

@@ -1,6 +1,16 @@
 use crate::commands::commands::CommandSelection;
 use crate::packs::repository::pack_repository::PackRepository;
+use crate::packs::resources::resource_manager::ResourceManager;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
+
+// TODO: fill in params
+pub async fn load(init_config: InitConfig) {}
+
+// TODO: fill in fields
+pub struct DataLoadContext {
+    resources: Box<dyn ResourceManager>,
+    data_configuration: WorldDataConfiguration,
+}
 
 #[derive(Debug)]
 pub struct InitConfig {
@@ -42,5 +52,9 @@ impl PackConfig {
             safe_mode,
             init_mode,
         }
+    }
+
+    pub fn create_resource_manager() -> (WorldDataConfiguration, Box<dyn ResourceManager>) {
+        todo!();
     }
 }

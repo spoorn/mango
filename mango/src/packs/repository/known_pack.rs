@@ -1,7 +1,7 @@
 use crate::shared_constants;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct KnownPack {
     pub namespace: String,
     pub id: String,

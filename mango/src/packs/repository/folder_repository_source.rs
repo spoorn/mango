@@ -1,4 +1,5 @@
 use crate::packs::pack_type::PackType;
+use crate::packs::repository::pack::Pack;
 use crate::packs::repository::pack_source::PackSource;
 use crate::packs::repository::repository_source::RepositorySource;
 use crate::world::level::validation::directory_validator::DirectoryValidator;
@@ -27,7 +28,7 @@ impl FolderRepositorySource {
     }
 }
 impl RepositorySource for FolderRepositorySource {
-    fn load_packs(&self) {
-        todo!();
+    fn load_packs(&self, consumer: &dyn FnOnce(Pack) -> ()) {
+        todo!()
     }
 }

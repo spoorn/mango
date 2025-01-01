@@ -6,9 +6,11 @@ use crate::packs::metadata::pack::{
     feature_flags_metadata_section, pack_metadata_section, MetadataSection,
 };
 use crate::packs::pack_location_info::PackLocationInfo;
+use crate::packs::pack_resources::PackResources;
 use crate::packs::pack_type::PackType;
 use crate::packs::repository::folder_repository_source::FolderRepositorySource;
 use crate::packs::repository::known_pack::KnownPack;
+use crate::packs::repository::pack::{Metadata, Pack, ResourcesSupplier};
 use crate::packs::repository::pack_repository::PackRepository;
 use crate::packs::repository::pack_source::PackSource;
 use crate::packs::repository::repository_source::RepositorySource;
@@ -19,6 +21,7 @@ use crate::world::flag::feature_flags;
 use crate::world::level::storage::level_resource::LevelResource;
 use crate::world::level::storage::level_storage_source::{LevelStorageAccess, LevelStorageSource};
 use crate::world::level::validation::directory_validator::DirectoryValidator;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct ServerPacksSource {
@@ -38,8 +41,19 @@ impl ServerPacksSource {
     }
 }
 impl RepositorySource for ServerPacksSource {
-    fn load_packs(&self) {
+    fn load_packs(&self, consumer: &dyn FnOnce(Pack) -> ()) {
         todo!();
+    }
+}
+
+struct FixedResources<T: PackResources>(T);
+impl<T: PackResources> ResourcesSupplier<T> for FixedResources<T> {
+    fn open_primary(&self, _location: PackLocationInfo) -> &T {
+        &self.0
+    }
+
+    fn open_full(&self, _location: PackLocationInfo, _metadata: Metadata) -> &T {
+        &self.0
     }
 }
 
@@ -47,18 +61,18 @@ fn built_in_metadata() -> BuiltInMetadata {
     BuiltInMetadata::of(
         [
             (
-                pack_metadata_section::TYPE.to_string(),
-                Box::new(PackMetadataSection::new(
+                pack_metadata_section::TYPE,
+                Rc::new(PackMetadataSection::new(
                     MutableComponent::translatable("dataPack.vanilla.description"),
                     shared_constants::WORLD_VERSION.get_pack_version(PackType::ServerData),
                     None,
-                )) as Box<dyn MetadataSection>,
+                )) as Rc<dyn MetadataSection>,
             ),
             (
-                feature_flags_metadata_section::TYPE.to_string(),
-                Box::new(FeatureFlagsMetadataSection {
+                feature_flags_metadata_section::TYPE,
+                Rc::new(FeatureFlagsMetadataSection {
                     flags: feature_flags::FEATURE_FLAGS.default_flags.clone(),
-                }) as Box<dyn MetadataSection>,
+                }) as Rc<dyn MetadataSection>,
             ),
         ]
         .into_iter(),

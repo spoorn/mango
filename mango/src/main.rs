@@ -1,5 +1,6 @@
 mod bootstrap;
 mod codec;
+mod commands;
 mod core;
 mod dedicated;
 mod detected_version;
@@ -12,10 +13,18 @@ mod shared_constants;
 mod sounds;
 mod util;
 mod world;
+mod world_loader;
 
+use crate::commands::commands::CommandSelection;
+use crate::dedicated::dedicated_server_properties::DedicatedServerProperties;
 use crate::dedicated::dedicated_server_settings::DedicatedServerSettings;
+use crate::packs::repository::pack_repository::PackRepository;
 use crate::packs::repository::server_packs_source;
+use crate::world::flag::feature_flags;
 use crate::world::level::storage::level_storage_source::LevelStorageSource;
+use crate::world::level::storage::level_summary::LevelSummary;
+use crate::world::level::world_data_configuration::WorldDataConfiguration;
+use crate::world_loader::{InitConfig, PackConfig};
 use tracing::{error, info, warn};
 
 async fn setup_logging() {
@@ -138,4 +147,37 @@ async fn main() {
         &mut level_storage_access,
     );
     info!("Pack Repository: {:#?}", pack_repository);
+
+    let init_config = load_or_create_config(
+        &properties,
+        level_data.map(|(_, level_summary)| level_summary),
+        properties.safe_mode,
+        pack_repository,
+    );
+    info!("Init Config: {:#?}", init_config);
+}
+
+fn load_or_create_config(
+    properties: &DedicatedServerProperties,
+    level_summary: Option<LevelSummary>,
+    safe_mode: bool,
+    pack_repo: PackRepository,
+) -> InitConfig {
+    let (init_mode, world_data_config) = match level_summary {
+        None => (
+            true,
+            WorldDataConfiguration::new(
+                properties.get_initial_data_pack_configuration(),
+                feature_flags::FEATURE_FLAGS.default_flags.clone(),
+            ),
+        ),
+        Some(level_summary) => (false, level_summary.settings.data_configuration),
+    };
+
+    let pack_config = PackConfig::new(pack_repo, world_data_config, safe_mode, init_mode);
+    InitConfig::new(
+        pack_config,
+        CommandSelection::Dedicated,
+        properties.function_permission_level,
+    )
 }

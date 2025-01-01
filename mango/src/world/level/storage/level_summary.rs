@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Serialize)]
 pub struct LevelSummary {
-    settings: LevelSettings,
+    pub settings: LevelSettings,
     level_version: LevelVersion,
     level_id: String,
     pub requires_manual_conversion: bool,

@@ -11,6 +11,14 @@ pub struct WorldDataConfiguration {
     datapacks: DataPackConfig,
     pub enabled_features: FeatureFlagSet,
 }
+impl WorldDataConfiguration {
+    pub fn new(datapacks: DataPackConfig, enabled_features: FeatureFlagSet) -> Self {
+        Self {
+            datapacks,
+            enabled_features,
+        }
+    }
+}
 impl Codec for WorldDataConfiguration {
     type Data = Dynamic<CompoundTag>;
 

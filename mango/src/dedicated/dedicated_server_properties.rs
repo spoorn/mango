@@ -1,3 +1,4 @@
+use crate::world::level::data_pack_config::DataPackConfig;
 use encoding_rs::UTF_8;
 use jiff::Zoned;
 use serde::{Deserialize, Serialize};
@@ -6,6 +7,7 @@ use std::io::Write;
 use std::io::{BufReader, BufWriter};
 use std::path::PathBuf;
 use tracing::{error, warn};
+use typetag::serde;
 
 // TODO: implement all properties
 #[derive(Debug, Serialize, Deserialize)]
@@ -22,6 +24,10 @@ pub struct DedicatedServerProperties {
     /// true to use vanilla datapacks only, else false
     #[serde(default)]
     pub safe_mode: bool,
+    #[serde(default = "default_function_permission_level")]
+    pub function_permission_level: u8,
+    #[serde(flatten)]
+    initial_data_pack_configuration: InitialDataPackConfig,
 }
 impl DedicatedServerProperties {
     pub fn from_file(path: impl Into<PathBuf>) -> Self {
@@ -54,6 +60,10 @@ impl DedicatedServerProperties {
             }
         }
     }
+
+    pub fn get_initial_data_pack_configuration(&self) -> DataPackConfig {
+        DataPackConfig::from(&self.initial_data_pack_configuration)
+    }
 }
 impl Default for DedicatedServerProperties {
     fn default() -> Self {
@@ -63,6 +73,43 @@ impl Default for DedicatedServerProperties {
             universe: ".".to_string(),
             level_name: "world".to_string(),
             safe_mode: false,
+            function_permission_level: 2,
+            initial_data_pack_configuration: InitialDataPackConfig::default(),
+        }
+    }
+}
+
+/// We have a separate struct for initial DataPackConfig to not leak different naming conventions
+/// to the actual DataPackConfig struct
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+struct InitialDataPackConfig {
+    #[serde(default = "default_initial_enabled_packs")]
+    initial_enabled_packs: String,
+    #[serde(default = "default_initial_disabled_packs")]
+    initial_disabled_packs: String,
+}
+impl Default for InitialDataPackConfig {
+    fn default() -> Self {
+        Self {
+            initial_enabled_packs: default_initial_enabled_packs(),
+            initial_disabled_packs: default_initial_disabled_packs(),
+        }
+    }
+}
+impl From<&InitialDataPackConfig> for DataPackConfig {
+    fn from(value: &InitialDataPackConfig) -> Self {
+        Self {
+            enabled: value
+                .initial_enabled_packs
+                .split(',')
+                .map(String::from)
+                .collect(),
+            disabled: value
+                .initial_disabled_packs
+                .split(',')
+                .map(String::from)
+                .collect(),
         }
     }
 }
@@ -82,4 +129,16 @@ fn default_universe() -> String {
 
 fn default_level_name() -> String {
     "world".to_string()
+}
+
+fn default_function_permission_level() -> u8 {
+    2
+}
+
+fn default_initial_enabled_packs() -> String {
+    DataPackConfig::default().enabled.join(",")
+}
+
+fn default_initial_disabled_packs() -> String {
+    DataPackConfig::default().disabled.join(",")
 }

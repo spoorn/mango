@@ -5,7 +5,7 @@ use std::io::{BufReader, Read};
 
 /// This is synchronous right now. May want to make it async if this gets called from multiple
 /// sources. For now it's fine because the stream should be loaded into the binary instead of
-/// reading from a file on the system.
+/// reading from a file on the system and is only called on startup and reload commands.
 pub fn get_metadata_from_stream(
     metadata_section_type: &MetadataSectionType,
     stream: impl Read,

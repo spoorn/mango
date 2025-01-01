@@ -1,4 +1,5 @@
 use crate::network::chat::component_contents::ComponentContents;
+use crate::network::chat::contents::plain_text_contents::PlainTextContents;
 use crate::network::chat::contents::translatable_contents::TranslatableContents;
 use crate::network::chat::style::Style;
 use std::sync::Arc;
@@ -16,6 +17,10 @@ impl MutableComponent {
             siblings: Vec::new(),
             style: Style::default(),
         }
+    }
+
+    pub fn literal(id: &str) -> Self {
+        Self::create(Arc::new(PlainTextContents::new(id.to_string())))
     }
 
     pub fn translatable(keys: &str) -> Self {

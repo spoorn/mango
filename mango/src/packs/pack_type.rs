@@ -1,12 +1,12 @@
 use include_dir::{include_dir, Dir};
-use strum::EnumIter;
+use strum::{Display, EnumIter};
 
 pub const MC_ASSETS_ROOT_FILE: &str = ".mcassetsroot";
 
 pub static ASSETS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../assets");
 pub static DATA_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../data");
 
-#[derive(Copy, Clone, EnumIter, Eq, Hash, PartialEq, Debug)]
+#[derive(Copy, Clone, Display, EnumIter, Eq, Hash, PartialEq, Debug)]
 pub enum PackType {
     ClientResources,
     ServerData,

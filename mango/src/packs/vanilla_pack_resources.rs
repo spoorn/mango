@@ -6,11 +6,14 @@ use crate::packs::metadata::pack::MetadataSection;
 use crate::packs::pack_location_info::PackLocationInfo;
 use crate::packs::pack_resources::PackResources;
 use crate::packs::pack_type::{PackType, MC_ASSETS_ROOT_FILE};
+use crate::packs::repository::pack::Pack;
+use crate::resources::resource_location::ResourceLocation;
 use include_dir::Dir;
 use indexmap::IndexSet;
 use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
 use std::ops::Deref;
+use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::LazyLock;
 use strum::IntoEnumIterator;
@@ -51,7 +54,7 @@ static ROOT_DIR_BY_TYPE: LazyLock<HashMap<PackType, DirEntry>> = LazyLock::new(|
             }
         })
         .collect();
-    //debug!("Loaded root pack resource asset dirs by type: {:?}", res);
+    debug!("Loaded root pack resource asset dirs by type: {:?}", res);
     res
 });
 
@@ -78,7 +81,7 @@ impl PartialEq for DirEntry {
 }
 impl Eq for DirEntry {}
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct VanillaPackResources {
     location: PackLocationInfo,
     metadata: BuiltInMetadata,
@@ -101,6 +104,33 @@ impl VanillaPackResources {
             root_paths,
             paths_for_type,
         }
+    }
+
+    pub fn list_raw_paths(
+        &self,
+        pack_type: PackType,
+        pack_dir: &ResourceLocation,
+        mut consumer: impl FnMut(Option<&'static include_dir::DirEntry>) -> (),
+    ) {
+        match file_util::decompose_path(&pack_dir.path) {
+            Ok(path) => {
+                if let Some(paths_for_type) = self.paths_for_type.get(&pack_type) {
+                    let namespace = PathBuf::from(&pack_dir.namespace);
+                    paths_for_type.iter().for_each(|paths| {
+                        let entry = paths.get_entry(
+                            namespace.join(file_util::resolve_path(
+                                path.iter()
+                                    .map(|s| s.as_str())
+                                    .collect::<Vec<&str>>()
+                                    .as_slice(),
+                            )),
+                        );
+                        consumer(entry);
+                    });
+                }
+            }
+            Err(e) => error!("Invalid path {}: {:?}", pack_dir.path, e),
+        };
     }
 }
 impl PackResources for VanillaPackResources {

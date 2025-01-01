@@ -1,4 +1,9 @@
 use crate::network::chat::mutable_component::MutableComponent;
+use crate::packs::metadata::pack::feature_flags_metadata_section::FeatureFlagsMetadataSection;
+use crate::packs::metadata::pack::pack_metadata_section::PackMetadataSection;
+use crate::packs::metadata::pack::{
+    feature_flags_metadata_section, pack_metadata_section, MetadataSection,
+};
 use crate::packs::pack_location_info::PackLocationInfo;
 use crate::packs::pack_resources::PackResources;
 use crate::packs::pack_selection_config::PackSelectionConfig;
@@ -6,21 +11,36 @@ use crate::packs::pack_type::PackType;
 use crate::packs::repository::pack_compatibility::PackCompatibility;
 use crate::shared_constants;
 use crate::world::flag::feature_flag_set::FeatureFlagSet;
+use crate::world::phys::shapes::voxel_shape::VoxelShapeTrait;
+use std::fmt::Debug;
+use std::ops::{Range, RangeInclusive};
+use std::rc::Rc;
+use std::sync::Arc;
+use tracing::{error, warn};
 
 #[derive(Clone, Debug)]
 pub struct Pack {
     pub location: PackLocationInfo,
+    pub resources: Rc<dyn ResourcesSupplier>,
+    pub metadata: Metadata,
     pub selection_config: PackSelectionConfig,
 }
 impl Pack {
-    pub fn read_meta_and_create<T: PackResources>(
+    pub fn read_meta_and_create(
         location: PackLocationInfo,
-        supplier: impl ResourcesSupplier<T>,
+        // Make the compiler happy by making it static lifetime
+        supplier: Rc<dyn ResourcesSupplier + 'static>,
         pack_type: PackType,
         selection_config: PackSelectionConfig,
-    ) -> Self {
+    ) -> Option<Self> {
         let pack_version = shared_constants::WORLD_VERSION.get_pack_version(pack_type);
-        todo!();
+        let metadata = Metadata::read_pack_metadata(&location, &supplier, pack_version)?;
+        Some(Self {
+            location,
+            resources: supplier,
+            metadata,
+            selection_config,
+        })
     }
 
     pub fn is_required(&self) -> bool {
@@ -76,6 +96,7 @@ impl Position {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct Metadata {
     description: MutableComponent,
     compatibility: PackCompatibility,
@@ -83,18 +104,74 @@ pub struct Metadata {
     overlays: Vec<String>,
 }
 impl Metadata {
-    pub fn read_pack_metadata<T: PackResources>(
-        location: PackLocationInfo,
-        supplier: impl ResourcesSupplier<T>,
+    pub fn read_pack_metadata(
+        location: &PackLocationInfo,
+        supplier: &Rc<dyn ResourcesSupplier>,
         pack_version: u32,
-    ) -> Self {
+    ) -> Option<Self> {
         let resources = supplier.open_primary(location);
-        todo!();
+        let pack_metadata_section = resources.get_metadata_section(pack_metadata_section::TYPE);
+        if pack_metadata_section.is_none() {
+            warn!("Missing metadata in pack {}", location.id);
+            return None;
+        }
+        let pack_metadata_section = pack_metadata_section.unwrap();
+        let pack_metadata_section = pack_metadata_section
+            .as_any()
+            .downcast_ref::<PackMetadataSection>()
+            .expect("Invalid pack metadata section in pack");
+        let feature_flags_metadata_section =
+            resources.get_metadata_section(feature_flags_metadata_section::TYPE);
+        let feature_flag_set = match feature_flags_metadata_section {
+            None => FeatureFlagSet::empty(),
+            Some(section) => {
+                match section
+                    .as_any()
+                    .downcast_ref::<FeatureFlagsMetadataSection>()
+                {
+                    None => panic!("Invalid feature flags section in pack {}", location.id),
+                    Some(feature_flags_section) => feature_flags_section.flags.clone(),
+                }
+            }
+        };
+        let range = Self::get_declared_pack_versions(&location.id, pack_metadata_section);
+        let pack_compatibility = PackCompatibility::for_version(range, pack_version);
+        // TODO: OverlayMetadataSection does not seem to be used in vanilla server
+        Some(Self {
+            description: pack_metadata_section.description.clone(),
+            compatibility: pack_compatibility,
+            requested_features: feature_flag_set,
+            overlays: Vec::new(),
+        })
+    }
+
+    fn get_declared_pack_versions(
+        id: &String,
+        pack_metadata_section: &PackMetadataSection,
+    ) -> RangeInclusive<u32> {
+        match &pack_metadata_section.supported_formats {
+            None => 0..=pack_metadata_section.pack_format,
+            Some(supported_formats) => {
+                if supported_formats.contains(&pack_metadata_section.pack_format) {
+                    supported_formats.clone()
+                } else {
+                    warn!("Pack {} declared support for versions {:?} but declared main format is {}, defaulting to {}",
+                        id,
+                        supported_formats,
+                        pack_metadata_section.pack_format,
+                        pack_metadata_section.pack_format);
+                    0..=pack_metadata_section.pack_format
+                }
+            }
+        }
     }
 }
 
-pub trait ResourcesSupplier<T: PackResources> {
-    fn open_primary(&self, location: PackLocationInfo) -> &T;
+pub trait ResourcesSupplier: Debug {
+    fn open_primary(&self, location: &PackLocationInfo) -> Arc<dyn PackResources>;
 
-    fn open_full(&self, location: PackLocationInfo, metadata: Metadata) -> &T;
+    /// All implementations of this do the same thing as open_primary because the Metadata has
+    /// no overlays in the vanilla server
+    fn open_full(&self, location: &PackLocationInfo, metadata: &Metadata)
+        -> Arc<dyn PackResources>;
 }

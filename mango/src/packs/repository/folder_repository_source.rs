@@ -1,9 +1,12 @@
 use crate::packs::pack_type::PackType;
-use crate::packs::repository::pack::Pack;
+use crate::packs::repository::pack::{Pack, ResourcesSupplier};
+use crate::packs::repository::pack_detector;
 use crate::packs::repository::pack_source::PackSource;
 use crate::packs::repository::repository_source::RepositorySource;
 use crate::world::level::validation::directory_validator::DirectoryValidator;
 use std::path::PathBuf;
+use std::rc::Rc;
+use tracing::info;
 
 #[derive(Debug)]
 pub struct FolderRepositorySource {
@@ -28,7 +31,23 @@ impl FolderRepositorySource {
     }
 }
 impl RepositorySource for FolderRepositorySource {
-    fn load_packs(&self, consumer: &dyn FnOnce(Pack) -> ()) {
+    fn load_packs(&self, consumer: &mut dyn FnMut(Pack) -> ()) {
         todo!()
     }
+}
+
+pub fn discover_packs(
+    dir: &'static include_dir::Dir,
+    _validator: DirectoryValidator,
+    mut consumer: impl FnMut(&'static include_dir::DirEntry, Rc<dyn ResourcesSupplier>) -> (),
+) {
+    dir.entries()
+        .iter()
+        .for_each(|entry| match pack_detector::detect_pack_resources(entry) {
+            None => info!(
+                "Found non-pack entry '{}', ignoring",
+                entry.path().display()
+            ),
+            Some(supplier) => consumer(entry, supplier),
+        });
 }

@@ -1,2 +1,2 @@
 pub mod directory_validator;
-mod forbidden_symlink_info;
+pub mod forbidden_symlink_info;

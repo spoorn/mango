@@ -30,7 +30,7 @@ impl PackRepository {
     fn discover_available(&self) -> HashMap<String, Pack> {
         let mut available = HashMap::new();
         self.sources.iter().for_each(|source| {
-            source.load_packs(&|pack| {
+            source.load_packs(&mut |pack| {
                 available.insert(pack.location.id.clone(), pack);
             });
         });

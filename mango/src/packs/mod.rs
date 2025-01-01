@@ -1,5 +1,7 @@
 pub mod abstract_pack_resources;
 pub mod built_in_metadata;
+mod file_pack_resources;
+mod inline_pack_resources;
 pub mod metadata;
 pub mod pack_location_info;
 pub mod pack_resources;

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::rc::Rc;
 
-#[derive(Default, Debug)]
+#[derive(Clone, Default, Debug)]
 pub struct BuiltInMetadata {
     values: HashMap<MetadataSectionType, Rc<dyn MetadataSection>>,
 }

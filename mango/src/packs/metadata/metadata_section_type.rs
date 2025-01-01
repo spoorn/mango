@@ -8,7 +8,7 @@ use anyhow::Result;
 use serde_json::Value;
 use std::hash::{Hash, Hasher};
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct MetadataSectionType {
     pub name: &'static str,
     pub codec: fn(Value) -> Result<Box<dyn MetadataSection>>,

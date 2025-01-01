@@ -3,7 +3,8 @@ use crate::network::chat::mutable_component::MutableComponent;
 use crate::packs::metadata::metadata_section_type::MetadataSectionType;
 use crate::packs::metadata::pack::MetadataSection;
 use serde_json::Value;
-use std::ops::Range;
+use std::any::Any;
+use std::ops::RangeInclusive;
 
 // Some serious Rust coercion magic: https://users.rust-lang.org/t/rule-s-about-casting-from-trait-implementation-type-to-dyn-trait-type/104392/4
 pub const TYPE: MetadataSectionType = MetadataSectionType::new("pack", |e| {
@@ -12,15 +13,15 @@ pub const TYPE: MetadataSectionType = MetadataSectionType::new("pack", |e| {
 
 #[derive(Debug)]
 pub struct PackMetadataSection {
-    description: MutableComponent,
-    pack_format: u32,
-    supported_formats: Option<Range<u32>>,
+    pub description: MutableComponent,
+    pub pack_format: u32,
+    pub supported_formats: Option<RangeInclusive<u32>>,
 }
 impl PackMetadataSection {
     pub fn new(
         description: MutableComponent,
         pack_format: u32,
-        supported_formats: Option<Range<u32>>,
+        supported_formats: Option<RangeInclusive<u32>>,
     ) -> Self {
         Self {
             description,
@@ -29,7 +30,11 @@ impl PackMetadataSection {
         }
     }
 }
-impl MetadataSection for PackMetadataSection {}
+impl MetadataSection for PackMetadataSection {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
 impl Codec for PackMetadataSection {
     type Data = Value;
 

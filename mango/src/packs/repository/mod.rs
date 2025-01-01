@@ -2,6 +2,7 @@ mod folder_repository_source;
 pub mod known_pack;
 pub mod pack;
 pub mod pack_compatibility;
+mod pack_detector;
 pub mod pack_repository;
 pub mod pack_source;
 pub mod repository_source;

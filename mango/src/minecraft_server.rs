@@ -5,9 +5,9 @@ use crate::world::level::world_data_configuration::WorldDataConfiguration;
 
 pub struct MinecraftServer {}
 
-fn configure_pack_repository(
-    mut pack_repo: PackRepository,
-    world_data_configuration: WorldDataConfiguration,
+pub fn configure_pack_repository(
+    mut pack_repo: &mut PackRepository,
+    world_data_configuration: &WorldDataConfiguration,
     init_mode: bool,
     safe_mode: bool,
 ) {

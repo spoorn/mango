@@ -22,10 +22,8 @@ impl Default for DataPackConfig {
         }
     }
 }
-impl Codec for DataPackConfig {
-    type Data = CompoundTag;
-
-    fn decode(data: Self::Data) -> Result<Self> {
+impl Codec<CompoundTag> for DataPackConfig {
+    fn decode(data: CompoundTag) -> Result<Self> {
         let enabled = data
             .get_list("Enabled")
             .iter()

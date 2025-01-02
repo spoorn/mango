@@ -179,6 +179,7 @@ async fn main() {
         pack_repository,
     );
     //info!("Init Config: {:#?}", init_config);
+    world_loader::load(init_config).await;
 }
 
 fn load_or_create_config(

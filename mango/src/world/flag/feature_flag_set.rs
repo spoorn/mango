@@ -6,6 +6,7 @@ use crate::world::flag::feature_flag::FeatureFlag;
 use crate::world::flag::feature_flags;
 use anyhow::{anyhow, Result};
 use serde::Serialize;
+use serde_json::Value;
 use tracing::error;
 
 #[derive(Clone, Debug, Serialize)]
@@ -22,7 +23,8 @@ impl FeatureFlagSet {
     }
 
     pub fn create<'a>(universe: String, mut flags: impl Iterator<Item = &'a FeatureFlag>) -> Self {
-        if flags.by_ref().peekable().peek().is_none() {
+        let mut flags = flags.by_ref().peekable();
+        if flags.peek().is_none() {
             Self::empty()
         } else {
             let mask = compute_mask(&universe, 0, flags);
@@ -83,14 +85,39 @@ impl Default for FeatureFlagSet {
         feature_flags::FEATURE_FLAGS.vanilla_set.clone()
     }
 }
-impl Codec for FeatureFlagSet {
-    type Data = ListTag;
-
-    fn decode(data: Self::Data) -> Result<Self> {
+impl Codec<ListTag> for FeatureFlagSet {
+    fn decode(data: ListTag) -> Result<Self> {
         let locations = data.iter().filter_map(|tag| match tag {
             Tag::StringTag(s) => Some(ResourceLocation::read(s)),
             _ => None,
         });
+
+        Self::from_names(locations)
+    }
+}
+impl Codec<Value> for FeatureFlagSet {
+    fn decode(data: Value) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let mut locations = match data.as_array() {
+            None => {
+                // attempt fallback for when we are given the outer JSON "features" object instead
+                match data.get("enabled").map(|e| e.as_array()).flatten() {
+                    None => {
+                        return Err(anyhow!(
+                            "features in pack metadata is missing enabled features array"
+                        ))
+                    }
+                    Some(e) => e,
+                }
+            }
+            Some(e) => e,
+        };
+        let locations = locations
+            .iter()
+            .filter_map(|value| value.as_str())
+            .map(ResourceLocation::read);
 
         Self::from_names(locations)
     }

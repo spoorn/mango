@@ -119,13 +119,11 @@ impl ServerPacksSource {
 
     /// wtf
     fn path_to_id(path: &Path) -> String {
-        path.file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .strip_suffix(".zip")
-            .unwrap()
-            .to_string()
+        let mut path = path.file_name().unwrap().to_str().unwrap();
+        if let Some(stripped_suffix) = path.strip_suffix(".zip") {
+            path = stripped_suffix;
+        }
+        path.to_string()
     }
 }
 impl RepositorySource for ServerPacksSource {
@@ -238,8 +236,10 @@ pub fn create_pack_repository(
     let path = access.get_level_path(LevelResource::DatapackDir);
     PackRepository::new(
         [
+            // Built in packs
             Box::new(ServerPacksSource::new(source.world_dir_validator))
                 as Box<dyn RepositorySource>,
+            // External datapacks
             Box::new(FolderRepositorySource::new(
                 path,
                 PackType::ServerData,

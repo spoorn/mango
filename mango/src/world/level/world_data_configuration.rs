@@ -19,10 +19,8 @@ impl WorldDataConfiguration {
         }
     }
 }
-impl Codec for WorldDataConfiguration {
-    type Data = Dynamic<CompoundTag>;
-
-    fn decode(data: Self::Data) -> anyhow::Result<Self> {
+impl Codec<Dynamic<CompoundTag>> for WorldDataConfiguration {
+    fn decode(data: Dynamic<CompoundTag>) -> anyhow::Result<Self> {
         let data = data.borrow();
         let datapacks = data
             .value

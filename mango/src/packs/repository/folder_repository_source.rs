@@ -6,7 +6,7 @@ use crate::packs::repository::repository_source::RepositorySource;
 use crate::world::level::validation::directory_validator::DirectoryValidator;
 use std::path::PathBuf;
 use std::rc::Rc;
-use tracing::info;
+use tracing::{info, warn};
 
 #[derive(Debug)]
 pub struct FolderRepositorySource {
@@ -44,10 +44,13 @@ pub fn discover_packs(
     dir.entries()
         .iter()
         .for_each(|entry| match pack_detector::detect_pack_resources(entry) {
-            None => info!(
+            None => warn!(
                 "Found non-pack entry '{}', ignoring",
                 entry.path().display()
             ),
-            Some(supplier) => consumer(entry, supplier),
+            Some(supplier) => {
+                info!("Discovered pack entry '{}'", entry.path().display());
+                consumer(entry, supplier)
+            }
         });
 }

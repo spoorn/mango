@@ -48,12 +48,10 @@ impl Display for ResourceLocation {
         write!(f, "{}:{}", self.namespace, self.path)
     }
 }
-impl Codec for ResourceLocation {
-    // TODO: waiting for https://github.com/rust-lang/rust/issues/63063 to avoid cloning Strings
-    // For now we lie and claim this is a static str as it *should* live long enough
-    type Data = &'static str;
-
-    fn decode(data: Self::Data) -> anyhow::Result<Self> {
+// TODO: waiting for https://github.com/rust-lang/rust/issues/63063 to avoid cloning Strings
+// For now we lie and claim this is a static str as it *should* live long enough
+impl Codec<&'static str> for ResourceLocation {
+    fn decode(data: &'static str) -> anyhow::Result<Self> {
         Ok(Self::read(data))
     }
 }

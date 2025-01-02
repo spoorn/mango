@@ -12,7 +12,7 @@ use crate::packs::repository::pack_compatibility::PackCompatibility;
 use crate::shared_constants;
 use crate::world::flag::feature_flag_set::FeatureFlagSet;
 use crate::world::phys::shapes::voxel_shape::VoxelShapeTrait;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Range, RangeInclusive};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -50,6 +50,19 @@ impl Pack {
 impl PartialEq for Pack {
     fn eq(&self, other: &Self) -> bool {
         self.location == other.location
+    }
+}
+impl Display for Pack {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Pack {{\n\
+        location: {:#?},\n\
+        metadata: {:#?},\n\
+        selection_config: {:#?}\n\
+        }}",
+            self.location, self.metadata, self.selection_config
+        )
     }
 }
 
@@ -136,7 +149,7 @@ impl Metadata {
         };
         let range = Self::get_declared_pack_versions(&location.id, pack_metadata_section);
         let pack_compatibility = PackCompatibility::for_version(range, pack_version);
-        // TODO: OverlayMetadataSection does not seem to be used in vanilla server
+        // TODO: OverlayMetadataSection does not seem to be used in vanilla server for built in metadata
         Some(Self {
             description: pack_metadata_section.description.clone(),
             compatibility: pack_compatibility,

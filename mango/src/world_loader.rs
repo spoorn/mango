@@ -1,10 +1,13 @@
 use crate::commands::commands::CommandSelection;
+use crate::minecraft_server;
 use crate::packs::repository::pack_repository::PackRepository;
 use crate::packs::resources::resource_manager::ResourceManager;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
 
 // TODO: fill in params
-pub async fn load(init_config: InitConfig) {}
+pub async fn load(mut init_config: InitConfig) {
+    let (data_config, resource_manager) = init_config.pack_config.create_resource_manager();
+}
 
 // TODO: fill in fields
 pub struct DataLoadContext {
@@ -54,7 +57,15 @@ impl PackConfig {
         }
     }
 
-    pub fn create_resource_manager() -> (WorldDataConfiguration, Box<dyn ResourceManager>) {
+    pub fn create_resource_manager(
+        &mut self,
+    ) -> (WorldDataConfiguration, Box<dyn ResourceManager>) {
+        let data_configuration = minecraft_server::configure_pack_repository(
+            &mut self.pack_repository,
+            &self.initial_data_config,
+            self.init_mode,
+            self.safe_mode,
+        );
         todo!();
     }
 }

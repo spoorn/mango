@@ -1,6 +1,7 @@
 use crate::packs::repository::pack::Pack;
 use crate::packs::repository::repository_source::RepositorySource;
 use std::collections::HashMap;
+use tracing::info;
 
 #[derive(Debug)]
 pub struct PackRepository {
@@ -31,6 +32,7 @@ impl PackRepository {
         let mut available = HashMap::new();
         self.sources.iter().for_each(|source| {
             source.load_packs(&mut |pack| {
+                info!("Discovered pack\n{}", pack);
                 available.insert(pack.location.id.clone(), pack);
             });
         });

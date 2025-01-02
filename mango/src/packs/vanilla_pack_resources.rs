@@ -117,13 +117,16 @@ impl VanillaPackResources {
                 if let Some(paths_for_type) = self.paths_for_type.get(&pack_type) {
                     let namespace = PathBuf::from(&pack_dir.namespace);
                     paths_for_type.iter().for_each(|paths| {
+                        // include_dirs is a little clunky and requires specifying the full path
                         let entry = paths.get_entry(
-                            namespace.join(file_util::resolve_path(
-                                path.iter()
-                                    .map(|s| s.as_str())
-                                    .collect::<Vec<&str>>()
-                                    .as_slice(),
-                            )),
+                            paths.path().join(
+                                namespace.join(file_util::resolve_path(
+                                    path.iter()
+                                        .map(|s| s.as_str())
+                                        .collect::<Vec<&str>>()
+                                        .as_slice(),
+                                )),
+                            ),
                         );
                         consumer(entry);
                     });
@@ -141,7 +144,10 @@ impl PackResources for VanillaPackResources {
         }
 
         for root_path in &self.root_paths {
-            if let Some(file) = root_path.get_file(file_util::resolve_path(parts)) {
+            // include_dirs is clunky and requires the full path
+            if let Some(file) =
+                root_path.get_file(root_path.path().join(file_util::resolve_path(parts)))
+            {
                 return Some(file.contents());
             }
         }

@@ -35,7 +35,7 @@ pub struct InlinePackResources {
     pub contents: &'static [u8],
 }
 impl PackResources for InlinePackResources {
-    fn get_root_resource(&self, paths: &[&str]) -> Option<&[u8]> {
+    fn get_root_resource(&self, _paths: &[&str]) -> Option<&[u8]> {
         Some(self.contents)
     }
 

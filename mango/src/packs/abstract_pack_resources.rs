@@ -2,7 +2,7 @@ use crate::packs::metadata::metadata_section_type::MetadataSectionType;
 use crate::packs::metadata::pack::MetadataSection;
 use serde_json::Value;
 use std::io::{BufReader, Read};
-use tracing::{error, info};
+use tracing::info;
 
 /// Deserializes pack.mcmeta into its sections.
 ///

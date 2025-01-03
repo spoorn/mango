@@ -1,9 +1,7 @@
 use crate::network::chat::mutable_component::MutableComponent;
 use crate::packs::metadata::pack::feature_flags_metadata_section::FeatureFlagsMetadataSection;
 use crate::packs::metadata::pack::pack_metadata_section::PackMetadataSection;
-use crate::packs::metadata::pack::{
-    feature_flags_metadata_section, pack_metadata_section, MetadataSection,
-};
+use crate::packs::metadata::pack::{feature_flags_metadata_section, pack_metadata_section};
 use crate::packs::pack_location_info::PackLocationInfo;
 use crate::packs::pack_resources::PackResources;
 use crate::packs::pack_selection_config::PackSelectionConfig;
@@ -11,12 +9,11 @@ use crate::packs::pack_type::PackType;
 use crate::packs::repository::pack_compatibility::PackCompatibility;
 use crate::shared_constants;
 use crate::world::flag::feature_flag_set::FeatureFlagSet;
-use crate::world::phys::shapes::voxel_shape::VoxelShapeTrait;
 use std::fmt::{Debug, Display, Formatter};
-use std::ops::{Range, RangeInclusive};
+use std::ops::RangeInclusive;
 use std::rc::Rc;
 use std::sync::Arc;
-use tracing::{error, warn};
+use tracing::warn;
 
 #[derive(Clone, Debug)]
 pub struct Pack {

@@ -6,7 +6,6 @@ use crate::packs::metadata::pack::MetadataSection;
 use crate::packs::pack_location_info::PackLocationInfo;
 use crate::packs::pack_resources::PackResources;
 use crate::packs::pack_type::{PackType, MC_ASSETS_ROOT_FILE};
-use crate::packs::repository::pack::Pack;
 use crate::resources::resource_location::ResourceLocation;
 use include_dir::Dir;
 use indexmap::IndexSet;
@@ -17,7 +16,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::LazyLock;
 use strum::IntoEnumIterator;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 // TODO: the asset files are empty in vanilla, why?
 // It seems these don't get read anyways. I can't find any code that looks for `.mcassetsroot`
@@ -61,7 +60,7 @@ static ROOT_DIR_BY_TYPE: LazyLock<HashMap<PackType, DirEntry>> = LazyLock::new(|
 /// We include the asset directories directly into the binary and access them through include_dir's
 /// [File] handler. We make it hashable here to help with deduping.
 #[derive(Debug)]
-struct DirEntry(&'static Dir<'static>);
+pub struct DirEntry(&'static Dir<'static>);
 impl Deref for DirEntry {
     type Target = &'static Dir<'static>;
 

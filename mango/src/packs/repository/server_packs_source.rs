@@ -23,10 +23,9 @@ use crate::world::flag::feature_flags;
 use crate::world::level::storage::level_resource::LevelResource;
 use crate::world::level::storage::level_storage_source::{LevelStorageAccess, LevelStorageSource};
 use crate::world::level::validation::directory_validator::DirectoryValidator;
-use include_dir::{Dir, DirEntry};
 use std::collections::HashMap;
 use std::fmt::Debug;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 use tracing::warn;
@@ -64,7 +63,7 @@ impl ServerPacksSource {
         self.populate_pack_list(|id, supplier| {
             suppliers.insert(id, supplier);
         });
-        suppliers.into_iter().for_each(|(id, mut supplier)| {
+        suppliers.into_iter().for_each(|(id, supplier)| {
             if let Some(pack) = supplier(id) {
                 consumer(pack);
             }

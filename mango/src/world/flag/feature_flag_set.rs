@@ -100,7 +100,7 @@ impl Codec<Value> for FeatureFlagSet {
     where
         Self: Sized,
     {
-        let mut locations = match data.as_array() {
+        let locations = match data.as_array() {
             None => {
                 // attempt fallback for when we are given the outer JSON "features" object instead
                 match data.get("enabled").map(|e| e.as_array()).flatten() {

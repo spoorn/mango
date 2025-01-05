@@ -43,6 +43,10 @@ impl Pack {
     pub fn is_required(&self) -> bool {
         self.selection_config.required
     }
+
+    pub fn get_requested_features(&self) -> &FeatureFlagSet {
+        &self.metadata.requested_features
+    }
 }
 impl PartialEq for Pack {
     fn eq(&self, other: &Self) -> bool {
@@ -110,7 +114,7 @@ impl Position {
 pub struct Metadata {
     description: MutableComponent,
     compatibility: PackCompatibility,
-    requested_features: FeatureFlagSet,
+    pub requested_features: FeatureFlagSet,
     overlays: Vec<String>,
 }
 impl Metadata {

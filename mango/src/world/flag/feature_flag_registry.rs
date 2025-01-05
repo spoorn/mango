@@ -1,13 +1,27 @@
 use crate::resources::resource_location::ResourceLocation;
 use crate::world::flag::feature_flag::FeatureFlag;
 use crate::world::flag::feature_flag_set::FeatureFlagSet;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub struct FeatureFlagRegistry {
     pub universe: String,
     pub names: HashMap<ResourceLocation, FeatureFlag>,
     pub all_flags: FeatureFlagSet,
+}
+impl FeatureFlagRegistry {
+    pub fn to_names(&self, flags: &FeatureFlagSet) -> HashSet<ResourceLocation> {
+        self.names
+            .iter()
+            .filter_map(|(location, flag)| {
+                if flags.contains(flag) {
+                    Some(location.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
 
 pub struct FeatureFlagRegistryBuilder {

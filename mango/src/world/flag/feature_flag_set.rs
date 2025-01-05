@@ -9,15 +9,16 @@ use serde::Serialize;
 use serde_json::Value;
 use tracing::error;
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
 pub struct FeatureFlagSet {
-    feature_flag_universe: String,
+    // TODO: make this Optional as vanilla utilizes null, instead of empty string
+    universe: String,
     mask: i64,
 }
 impl FeatureFlagSet {
     pub fn empty() -> Self {
         Self {
-            feature_flag_universe: "".to_string(),
+            universe: "".to_string(),
             mask: 0,
         }
     }
@@ -28,17 +29,18 @@ impl FeatureFlagSet {
             Self::empty()
         } else {
             let mask = compute_mask(&universe, 0, flags);
-            Self {
-                feature_flag_universe: universe,
-                mask,
-            }
+            Self { universe, mask }
         }
     }
 
     pub fn is_subset_of(&self, feature_flag_set: &FeatureFlagSet) -> bool {
-        self.feature_flag_universe == ""
-            || (self.feature_flag_universe == feature_flag_set.feature_flag_universe
+        self.universe == ""
+            || (self.universe == feature_flag_set.universe
                 && (self.mask & !feature_flag_set.mask) == 0)
+    }
+
+    pub fn contains(&self, other: &FeatureFlag) -> bool {
+        self.universe == other.universe && (self.mask & other.mask != 0)
     }
 
     fn from_names<'a>(locations: impl Iterator<Item = ResourceLocation>) -> Result<Self> {
@@ -71,11 +73,50 @@ impl FeatureFlagSet {
             ))
         }
     }
+
+    pub fn join(self, other: FeatureFlagSet) -> Self {
+        if self.universe == "" {
+            other
+        } else if other.universe == "" {
+            self
+        } else if self.universe != other.universe {
+            panic!(
+                "Mismatched set elements: '{}' != '{}'",
+                self.universe, other.universe
+            );
+        } else {
+            FeatureFlagSet {
+                universe: self.universe,
+                mask: self.mask | other.mask,
+            }
+        }
+    }
+
+    pub fn subtract(&self, other: FeatureFlagSet) -> FeatureFlagSet {
+        if self.universe == "" || other.universe == "" {
+            self.clone()
+        } else if self.universe != other.universe {
+            panic!(
+                "Mismatched set elements: '{}' != '{}'",
+                self.universe, other.universe
+            );
+        } else {
+            let mask = self.mask & !other.mask;
+            if mask == 0 {
+                FeatureFlagSet::empty()
+            } else {
+                FeatureFlagSet {
+                    universe: self.universe.clone(),
+                    mask,
+                }
+            }
+        }
+    }
 }
 impl From<&FeatureFlag> for FeatureFlagSet {
     fn from(value: &FeatureFlag) -> Self {
         Self {
-            feature_flag_universe: value.universe.clone(),
+            universe: value.universe.clone(),
             mask: value.mask,
         }
     }

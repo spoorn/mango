@@ -6,7 +6,7 @@ use crate::packs::repository::pack_source::PackSource;
 pub struct PackLocationInfo {
     pub id: String,
     title: MutableComponent,
-    source: PackSource,
+    pub source: PackSource,
     known_pack_info: Option<KnownPack>,
 }
 impl PackLocationInfo {

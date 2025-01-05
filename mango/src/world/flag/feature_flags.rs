@@ -33,6 +33,25 @@ pub struct FeatureFlags {
     pub default_flags: FeatureFlagSet,
 }
 
+pub fn print_missing_flags(
+    containing_flags: &FeatureFlagSet,
+    missing_flags: &FeatureFlagSet,
+) -> String {
+    let missing_locations = FEATURE_FLAGS.registry.to_names(missing_flags);
+    let containing_locations = FEATURE_FLAGS.registry.to_names(containing_flags);
+    missing_locations
+        .iter()
+        .filter_map(|location| {
+            if !containing_locations.contains(location) {
+                Some(location.to_string())
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<String>>()
+        .join(", ")
+}
+
 pub fn is_experimental(feature_flags: &FeatureFlagSet) -> bool {
     !feature_flags.is_subset_of(&FEATURE_FLAGS.vanilla_set)
 }

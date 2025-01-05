@@ -1,13 +1,14 @@
 use crate::packs::repository::pack::Pack;
 use crate::packs::repository::repository_source::RepositorySource;
+use crate::world::flag::feature_flag_set::FeatureFlagSet;
 use std::collections::HashMap;
 use tracing::info;
 
 #[derive(Debug)]
 pub struct PackRepository {
     sources: Vec<Box<dyn RepositorySource>>,
-    available: HashMap<String, Pack>,
-    selected: Vec<Pack>,
+    pub available: HashMap<String, Pack>,
+    pub selected: Vec<Pack>,
 }
 impl PackRepository {
     pub fn new(sources: impl Iterator<Item = Box<dyn RepositorySource>>) -> Self {
@@ -18,14 +19,22 @@ impl PackRepository {
         }
     }
 
+    pub fn set_selected(&mut self, selected: &[&String]) {
+        self.selected = self.rebuild_selected(selected);
+    }
+
+    pub fn get_selected_ids(&self) -> Vec<&String> {
+        self.selected.iter().map(|p| &p.location.id).collect()
+    }
+
+    pub fn is_available(&self, id: &String) -> bool {
+        self.available.contains_key(id)
+    }
+
     pub fn reload(&mut self) {
-        let curr = self
-            .selected
-            .iter()
-            .map(|p| p.location.id.clone())
-            .collect();
+        let curr: Vec<&String> = self.selected.iter().map(|p| &p.location.id).collect();
         self.available = self.discover_available();
-        self.selected = self.rebuild_selected(curr);
+        self.selected = self.rebuild_selected(&curr);
     }
 
     fn discover_available(&self) -> HashMap<String, Pack> {
@@ -39,10 +48,10 @@ impl PackRepository {
         available
     }
 
-    fn rebuild_selected(&self, ids: Vec<String>) -> Vec<Pack> {
+    fn rebuild_selected(&self, ids: &[&String]) -> Vec<Pack> {
         let mut available_packs: Vec<Pack> = ids
             .iter()
-            .filter_map(|id| self.available.get(id))
+            .filter_map(|id| self.available.get(*id))
             .cloned()
             .collect();
         self.available.values().for_each(|pack| {
@@ -53,5 +62,14 @@ impl PackRepository {
             }
         });
         available_packs
+    }
+
+    pub fn get_requested_feature_flags(&self) -> FeatureFlagSet {
+        self.selected
+            .iter()
+            .map(Pack::get_requested_features)
+            .cloned()
+            .reduce(FeatureFlagSet::join)
+            .unwrap_or_else(|| FeatureFlagSet::empty())
     }
 }

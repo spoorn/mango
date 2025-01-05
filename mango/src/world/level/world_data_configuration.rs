@@ -8,7 +8,7 @@ use std::borrow::Borrow;
 
 #[derive(Debug, Default, Serialize)]
 pub struct WorldDataConfiguration {
-    datapacks: DataPackConfig,
+    pub datapacks: DataPackConfig,
     pub enabled_features: FeatureFlagSet,
 }
 impl WorldDataConfiguration {

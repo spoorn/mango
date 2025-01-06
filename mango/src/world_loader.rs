@@ -1,6 +1,8 @@
 use crate::commands::commands::CommandSelection;
 use crate::minecraft_server;
+use crate::packs::pack_type::PackType;
 use crate::packs::repository::pack_repository::PackRepository;
+use crate::packs::resources::multi_pack_resource_manager::MultiPackResourceManager;
 use crate::packs::resources::resource_manager::ResourceManager;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
 
@@ -59,13 +61,15 @@ impl PackConfig {
 
     pub fn create_resource_manager(
         &mut self,
-    ) -> (WorldDataConfiguration, Box<dyn ResourceManager>) {
+    ) -> (WorldDataConfiguration, MultiPackResourceManager) {
         let data_configuration = minecraft_server::configure_pack_repository(
             &mut self.pack_repository,
             &self.initial_data_config,
             self.init_mode,
             self.safe_mode,
         );
-        todo!();
+        let packs = self.pack_repository.open_all_selected();
+        let manager = MultiPackResourceManager::new(PackType::ServerData, packs);
+        (data_configuration, manager)
     }
 }

@@ -1,7 +1,9 @@
+use crate::packs::pack_resources::PackResources;
 use crate::packs::repository::pack::Pack;
 use crate::packs::repository::repository_source::RepositorySource;
 use crate::world::flag::feature_flag_set::FeatureFlagSet;
 use std::collections::HashMap;
+use std::sync::Arc;
 use tracing::info;
 
 #[derive(Debug)]
@@ -71,5 +73,9 @@ impl PackRepository {
             .cloned()
             .reduce(FeatureFlagSet::join)
             .unwrap_or_else(|| FeatureFlagSet::empty())
+    }
+
+    pub fn open_all_selected(&self) -> Vec<Arc<dyn PackResources>> {
+        self.selected.iter().map(Pack::open).collect()
     }
 }

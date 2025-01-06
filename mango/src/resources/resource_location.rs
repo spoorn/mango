@@ -56,13 +56,13 @@ impl Codec<&'static str> for ResourceLocation {
     }
 }
 
-fn is_valid_namespace(namespace: &str) -> bool {
+pub fn is_valid_namespace(namespace: &str) -> bool {
     namespace
         .chars()
         .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-' || c == '.')
 }
 
-fn is_valid_path(path: &str) -> bool {
+pub fn is_valid_path(path: &str) -> bool {
     path.chars().all(|c| {
         c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-' || c == '.' || c == '/'
     })

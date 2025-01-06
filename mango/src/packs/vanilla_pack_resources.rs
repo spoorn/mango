@@ -11,6 +11,7 @@ use include_dir::Dir;
 use indexmap::IndexSet;
 use std::collections::{HashMap, HashSet};
 use std::hash::{Hash, Hasher};
+use std::io::Read;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -23,12 +24,12 @@ use tracing::{debug, error};
 static ROOT_DIR_BY_TYPE: LazyLock<HashMap<PackType, DirEntry>> = LazyLock::new(|| {
     let res = PackType::iter()
         .filter_map(|pack_type| {
-            let dir: &'static Dir = pack_type.get_directory();
+            let dir: &'static Dir = pack_type.get_inline_directory();
             match dir.get_file(MC_ASSETS_ROOT_FILE) {
                 None => {
                     error!(
                         "File {:?}/{} does not exist in binary path",
-                        pack_type.get_directory().path(),
+                        pack_type.get_inline_directory().path(),
                         MC_ASSETS_ROOT_FILE
                     );
                     None
@@ -137,7 +138,7 @@ impl VanillaPackResources {
 }
 impl PackResources for VanillaPackResources {
     // TODO: The VanillaPackResources only holds root paths to
-    fn get_root_resource(&self, parts: &[&str]) -> Option<&[u8]> {
+    fn get_root_resource(&self, parts: &[&str]) -> Option<Box<dyn Read>> {
         if let Err(e) = file_util::validate_path(parts) {
             panic!("Failed to validate paths: {:?}", e);
         }
@@ -147,11 +148,15 @@ impl PackResources for VanillaPackResources {
             if let Some(file) =
                 root_path.get_file(root_path.path().join(file_util::resolve_path(parts)))
             {
-                return Some(file.contents());
+                return Some(Box::new(file.contents()));
             }
         }
 
         None
+    }
+
+    fn get_namespaces(&self, pack_type: PackType) -> HashSet<String> {
+        self.namespaces.clone()
     }
 
     fn get_metadata_section(
@@ -168,6 +173,10 @@ impl PackResources for VanillaPackResources {
             }
         }
         self.metadata.get(&(metadata_section_type)).map(Rc::clone)
+    }
+
+    fn location(&self) -> &PackLocationInfo {
+        &self.location
     }
 }
 

@@ -41,9 +41,8 @@ pub fn discover_packs(
     _validator: DirectoryValidator,
     mut consumer: impl FnMut(&'static include_dir::DirEntry, Rc<dyn ResourcesSupplier>) -> (),
 ) {
-    dir.entries()
-        .iter()
-        .for_each(|entry| match pack_detector::detect_pack_resources(entry) {
+    dir.entries().iter().for_each(|entry| {
+        match pack_detector::detect_inlined_pack_resources(entry) {
             None => warn!(
                 "Found non-pack entry '{}', ignoring",
                 entry.path().display()
@@ -52,5 +51,6 @@ pub fn discover_packs(
                 info!("Discovered pack entry '{}'", entry.path().display());
                 consumer(entry, supplier)
             }
-        });
+        }
+    });
 }

@@ -47,6 +47,11 @@ impl Pack {
     pub fn get_requested_features(&self) -> &FeatureFlagSet {
         &self.metadata.requested_features
     }
+
+    pub fn open(&self) -> Arc<dyn PackResources> {
+        self.resources
+            .open_full(self.location.clone(), &self.metadata)
+    }
 }
 impl PartialEq for Pack {
     fn eq(&self, other: &Self) -> bool {
@@ -123,7 +128,7 @@ impl Metadata {
         supplier: &Rc<dyn ResourcesSupplier>,
         pack_version: u32,
     ) -> Option<Self> {
-        let resources = supplier.open_primary(location);
+        let resources = supplier.open_primary(location.clone());
         let pack_metadata_section = resources.get_metadata_section(pack_metadata_section::TYPE);
         if pack_metadata_section.is_none() {
             warn!("Missing metadata in pack {}", location.id);
@@ -182,10 +187,9 @@ impl Metadata {
 }
 
 pub trait ResourcesSupplier: Debug {
-    fn open_primary(&self, location: &PackLocationInfo) -> Arc<dyn PackResources>;
+    fn open_primary(&self, location: PackLocationInfo) -> Arc<dyn PackResources>;
 
     /// All implementations of this do the same thing as open_primary because the Metadata has
     /// no overlays in the vanilla server
-    fn open_full(&self, location: &PackLocationInfo, metadata: &Metadata)
-        -> Arc<dyn PackResources>;
+    fn open_full(&self, location: PackLocationInfo, metadata: &Metadata) -> Arc<dyn PackResources>;
 }

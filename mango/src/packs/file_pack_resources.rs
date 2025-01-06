@@ -2,7 +2,9 @@ use crate::packs::metadata::metadata_section_type::MetadataSectionType;
 use crate::packs::metadata::pack::MetadataSection;
 use crate::packs::pack_location_info::PackLocationInfo;
 use crate::packs::pack_resources::PackResources;
+use crate::packs::pack_type::PackType;
 use crate::packs::repository::pack::{Metadata, ResourcesSupplier};
+use std::collections::HashSet;
 use std::fmt::Debug;
 use std::io::Read;
 use std::rc::Rc;
@@ -24,22 +26,23 @@ impl<T: Read + Debug> FileResourcesSupplier<T> {
 //     }
 // }
 impl<T: Read + Debug> ResourcesSupplier for FileResourcesSupplier<T> {
-    fn open_primary(&self, location: &PackLocationInfo) -> Arc<dyn PackResources> {
+    fn open_primary(&self, location: PackLocationInfo) -> Arc<dyn PackResources> {
         todo!()
     }
 
-    fn open_full(
-        &self,
-        location: &PackLocationInfo,
-        metadata: &Metadata,
-    ) -> Arc<dyn PackResources> {
+    fn open_full(&self, location: PackLocationInfo, metadata: &Metadata) -> Arc<dyn PackResources> {
         todo!()
     }
 }
 
+#[derive(Debug)]
 pub struct FilePackResources {}
 impl PackResources for FilePackResources {
-    fn get_root_resource(&self, paths: &[&str]) -> Option<&[u8]> {
+    fn get_root_resource(&self, paths: &[&str]) -> Option<Box<dyn Read>> {
+        todo!()
+    }
+
+    fn get_namespaces(&self, pack_type: PackType) -> HashSet<String> {
         todo!()
     }
 
@@ -47,6 +50,10 @@ impl PackResources for FilePackResources {
         &self,
         metadata_section_type: MetadataSectionType,
     ) -> Option<Rc<dyn MetadataSection>> {
+        todo!()
+    }
+
+    fn location(&self) -> &PackLocationInfo {
         todo!()
     }
 }

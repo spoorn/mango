@@ -126,6 +126,7 @@ impl ServerPacksSource {
     }
 }
 impl RepositorySource for ServerPacksSource {
+    /// Load packs from the root vanilla pack resource, and nested datapacks
     fn load_packs(&self, consumer: &mut dyn FnMut(Pack) -> ()) {
         if let Some(pack) = create_vanilla_pack(self.vanilla_pack.clone()) {
             consumer(pack);
@@ -137,13 +138,13 @@ impl RepositorySource for ServerPacksSource {
 #[derive(Debug)]
 struct FixedResources<T: PackResources + Debug + 'static>(Arc<T>);
 impl<T: PackResources + Debug + 'static> ResourcesSupplier for FixedResources<T> {
-    fn open_primary(&self, _location: &PackLocationInfo) -> Arc<dyn PackResources> {
+    fn open_primary(&self, _location: PackLocationInfo) -> Arc<dyn PackResources> {
         Arc::clone(&self.0) as _
     }
 
     fn open_full(
         &self,
-        _location: &PackLocationInfo,
+        _location: PackLocationInfo,
         _metadata: &Metadata,
     ) -> Arc<dyn PackResources> {
         Arc::clone(&self.0) as _

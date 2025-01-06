@@ -11,8 +11,8 @@ use tracing::info;
 /// We only support reading the `pack` and `features` fields for now on the server side.
 ///
 /// This is synchronous right now. May want to make it async if this gets called from multiple
-/// sources. For now it's fine because the stream should be loaded into the binary instead of
-/// reading from a file on the system and is only called on startup and reload commands.
+/// sources. For now I think it's fine because this should only be called on startup and reload
+/// commands.
 pub fn get_metadata_from_stream(
     metadata_section_type: &MetadataSectionType,
     stream: impl Read,

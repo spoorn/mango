@@ -12,10 +12,17 @@ pub enum PackType {
     ServerData,
 }
 impl PackType {
-    pub fn get_directory(&self) -> &'static Dir<'static> {
+    pub fn get_inline_directory(&self) -> &'static Dir<'static> {
         match self {
             PackType::ClientResources => &ASSETS_DIR,
             PackType::ServerData => &DATA_DIR,
+        }
+    }
+
+    pub fn get_directory(&self) -> &'static str {
+        match self {
+            PackType::ClientResources => "assets",
+            PackType::ServerData => "data",
         }
     }
 }

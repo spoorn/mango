@@ -6,7 +6,7 @@ use tracing::debug;
 
 /// This differs quite a bit from vanilla as we inlined the resources into the binary.
 /// Thus, this does not support symlinks and does not need to run the DirectoryValidator
-pub fn detect_pack_resources(
+pub fn detect_inlined_pack_resources(
     entry: &'static include_dir::DirEntry,
 ) -> Option<Rc<dyn ResourcesSupplier>> {
     match entry {
@@ -19,9 +19,7 @@ pub fn detect_pack_resources(
                 );
                 None
             }
-            Some(mcmeta_file) => Some(Rc::new(InlinePackResourceSupplier {
-                contents: mcmeta_file.contents(),
-            })),
+            Some(_mcmeta_file) => Some(Rc::new(InlinePackResourceSupplier { entry })),
         },
         DirEntry::File(file) => {
             if file.path().ends_with(".zip") {

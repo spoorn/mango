@@ -11,15 +11,16 @@ use serde::Serialize;
 use std::fmt::Debug;
 use std::sync::{Arc, OnceLock};
 
-pub static REGISTRY: OnceLock<MappedRegistry<Arc<dyn Registry>>> = OnceLock::new();
+// TODO: This only needs to be around an Arc due to registry_access. Maybe use &'static everywhere instead?
+pub static REGISTRY: OnceLock<Arc<MappedRegistry<Arc<dyn Registry>>>> = OnceLock::new();
 pub static BLOCK: OnceLock<Arc<MappedRegistry<Arc<dyn BlockTrait>>>> = OnceLock::new();
 pub static ITEM: OnceLock<Arc<MappedRegistry<Arc<dyn ItemTrait>>>> = OnceLock::new();
 pub static ENTITY_TYPE: OnceLock<Arc<MappedRegistry<Arc<EntityType>>>> = OnceLock::new();
 // TODO: does SoundEvent need to be wrapped around Arc? They seem to be immutable so maybe we just copy everywhere
 pub static SOUND_EVENT: OnceLock<Arc<MappedRegistry<SoundEvent>>> = OnceLock::new();
 
-pub fn registry() -> &'static MappedRegistry<Arc<dyn Registry>> {
-    REGISTRY.get().unwrap()
+pub fn registry() -> Arc<MappedRegistry<Arc<dyn Registry>>> {
+    Arc::clone(REGISTRY.get().unwrap())
 }
 
 pub fn block_registry() -> Arc<MappedRegistry<Arc<dyn BlockTrait>>> {
@@ -46,10 +47,10 @@ pub fn sound_event_registry() -> Arc<MappedRegistry<SoundEvent>> {
 
 pub fn bootstrap() {
     REGISTRY.get_or_init(|| {
-        MappedRegistry::new(
+        Arc::new(MappedRegistry::new(
             ResourceKey::create_registry_key(root_registry_name()),
             Lifecycle::Stable,
-        )
+        ))
     });
     BLOCK.get_or_init(|| register_defaulted_with_intrusive_holders(registries::BLOCK.clone()));
     ITEM.get_or_init(|| register_defaulted_with_intrusive_holders(registries::ITEM.clone()));

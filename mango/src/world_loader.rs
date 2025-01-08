@@ -1,14 +1,16 @@
 use crate::commands::commands::CommandSelection;
-use crate::minecraft_server;
 use crate::packs::pack_type::PackType;
 use crate::packs::repository::pack_repository::PackRepository;
 use crate::packs::resources::multi_pack_resource_manager::MultiPackResourceManager;
 use crate::packs::resources::resource_manager::ResourceManager;
 use crate::world::level::world_data_configuration::WorldDataConfiguration;
+use crate::{minecraft_server, registry_layer};
 
 // TODO: fill in params
 pub async fn load(mut init_config: InitConfig) {
     let (data_config, resource_manager) = init_config.pack_config.create_resource_manager();
+    let layered_registry_access = registry_layer::create_registry_access();
+    todo!();
 }
 
 // TODO: fill in fields

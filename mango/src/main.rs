@@ -9,6 +9,7 @@ mod minecraft_server;
 mod nbt;
 mod network;
 mod packs;
+mod registry_layer;
 mod resources;
 mod shared_constants;
 mod sounds;

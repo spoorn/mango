@@ -1,6 +1,6 @@
 use crate::util;
 use regex::Regex;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct ResourceLocationPattern {

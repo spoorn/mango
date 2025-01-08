@@ -9,7 +9,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::Arc;
 
-#[derive(Debug)]
 pub struct MultiPackResourceManager {
     namespaced_managers: HashMap<String, FallbackResourceManager>,
     packs: Vec<Arc<dyn PackResources>>,

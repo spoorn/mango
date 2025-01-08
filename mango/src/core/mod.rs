@@ -3,10 +3,12 @@ use std::sync::{Arc, LazyLock};
 
 pub mod block_pos;
 pub mod direction;
+pub mod layered_registry_access;
 pub mod mapped_registry;
 pub mod registration_info;
 pub mod registries;
 pub mod registry;
+pub mod registry_access;
 pub mod vec3i;
 
 pub struct Indexed<T> {

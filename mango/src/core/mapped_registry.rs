@@ -40,6 +40,8 @@ pub trait WritableRegistry<T> {
 
     fn get(&self, index: usize) -> Option<Self::Result>;
 
+    fn get_optional_by_key(&self, key: &ResourceKey) -> Option<Self::Result>;
+
     fn key(&self) -> &ResourceKey;
 }
 
@@ -119,6 +121,10 @@ impl<T: Clone> WritableRegistry<T> for MappedRegistry<T> {
         self.values.read().unwrap().get(index).cloned()
     }
 
+    fn get_optional_by_key(&self, key: &ResourceKey) -> Option<Self::Result> {
+        self.by_key.get(key).map(|index| self.get(*index).unwrap())
+    }
+
     fn key(&self) -> &ResourceKey {
         &self.key
     }
@@ -154,6 +160,11 @@ impl<T: BlockTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dy
         (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).get(index)
     }
 
+    fn get_optional_by_key(&self, key: &ResourceKey) -> Option<Self::Result> {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>)
+            .get_optional_by_key(key)
+    }
+
     fn key(&self) -> &ResourceKey {
         (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).key()
     }
@@ -177,6 +188,11 @@ impl<T: ItemTrait + 'static> WritableRegistry<Arc<T>> for MappedRegistry<Arc<dyn
 
     fn get(&self, index: usize) -> Option<Self::Result> {
         (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>).get(index)
+    }
+
+    fn get_optional_by_key(&self, key: &ResourceKey) -> Option<Self::Result> {
+        (self as &dyn WritableRegistry<Self::Result, Result = Self::Result>)
+            .get_optional_by_key(key)
     }
 
     fn key(&self) -> &ResourceKey {
